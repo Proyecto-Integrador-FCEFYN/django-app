@@ -1,0 +1,66 @@
+{% extends "base_login.html" %}
+
+{% block content %}
+
+<!-- Para django-bootstrap4. -->
+{% load bootstrap4 %}
+
+
+<!-- Pagina de logueo de usuario. -->
+<div class="text-center my-auto">
+    <form class="form-signin" method="post" action="{% url 'users:login' %}">
+        {% csrf_token %}
+        <h1 class="h3 mb-3">Control de acceso al LAC</h1>
+        <!-- Si el formulario contiene errores, los recorre y los muestra. -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                    <div class="text-left">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <!-- Si se viene de una pagina distinta que la raiz. -->
+        {% if next %}
+            <!-- Mensaje de error con un link hacia un modal que especifica el problema. -->
+            <div class="alert alert-danger" role="alert">
+                <div class="text-left">No tiene permiso de acceso a esta página.
+                <a href="#" class="alert-link" data-toggle="modal" data-target="#modalInfo">Saber más.</a>
+                </div>
+            </div>
+            <!-- Modal que detalla las posibles causas del problema. -->
+            <div class="modal fade" id="modalInfo" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTitle">Saber más</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-left">
+                            Esto puede ser debido a que usted debe registrarse, ser administrador o si ya se encontraba registrado, otro usuario accedió con su cuenta.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- Se recorren los campos visibles del formulario y se los muestran sin la etiqueta. -->
+        {% for field in form.visible_fields %}
+            <div class="form-group">
+                {% bootstrap_field field show_label=False %}
+            </div>
+        {% endfor %}
+        <button class="btn btn-lg btn-primary btn-block mb-2" type="submit"><span class="fa fa-sign-in"></span> Acceder</button>
+        <!-- Variable "next" utilizada por el sistema de logueo del "auth". -->
+        <input type="hidden" name="next" value="{{ next }}">
+        <!-- Los enlaces. -->
+        <div class="text clearfix">
+            <a class="float-left" href='/acceder/olvide-usuario'>Olvidé mi usuario</a>
+            <a class="float-right" href='/acceder/olvide-clave'>Olvidé mi contraseña</a>
+        </div>
+        <!-- Se incluyen los logos de la facultad y de la universidad. -->
+        {% include 'snippets/logos.html' %}
+    </form>
+</div>
+
+{% endblock content %}

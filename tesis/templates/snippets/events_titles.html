@@ -1,0 +1,12 @@
+<!-- Titulos de las paginas de eventos dependiendo del filtro de fechas utilizado. -->
+<h5 class="h5 text-info mb-3">
+{% if begin == '' and end == '' or not begin and not end%}
+	Se muestran todos los ítems
+{% elif begin == '' %}
+	Se muestran los ítems antes del {{ end_formatted }}
+{% elif end == '' %}
+	Se muestran los ítems despues del {{ begin_formatted }}
+{% else %}
+	Se muestran los ítems entre {{ begin_formatted }} y {{ end_formatted }}
+{% endif %}
+</h5>

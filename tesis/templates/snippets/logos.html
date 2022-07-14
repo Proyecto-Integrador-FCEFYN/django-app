@@ -1,0 +1,13 @@
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+<!-- Los logos de la facultad y la universidad ubicados en una tabla, con tamaños adaptables y bordes redondeados. -->
+<hr>
+<div class="row">
+    <div class="col">
+        <img src="{% static 'images/fcefyn-logo.jpg' %}" class="img-fluid rounded" alt="No se encontro la imagen">
+    </div>
+    <div class="col">
+        <img src="{% static 'images/unc-logo.jpg' %}" class="img-fluid rounded" alt="No se encontro la imagen">
+    </div>
+</div>

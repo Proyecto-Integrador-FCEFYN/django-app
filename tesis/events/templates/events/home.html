@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+Inicio
+{% endblock title %}
+
+{% block content %}
+
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+
+<!-- Pagina de inicio, donde se puede ver el stream y abrir la puerta. -->
+<!-- Los valores de alto y ancho son los del motion por defecto. -->
+<div align="center">
+	<div class="container" style="max-width:500px; max-height:375px;">
+		<img class="img-fluid mt-3" src="{% static 'images/pause-stream.jpg'%}" style="max-width:100%; height:auto" id="stream">
+	</div>
+</div>
+
+<!-- El atributo "action" indica a que url
+enviar el formulario para el tratamiento del mismo,
+en este caso tambien se puede dejar vacio ya que
+es la misma vista la que se encarga del procesamiento.-->
+<div class="container">
+	<div class="row justify-content-center mt-3">
+		<form action="/inicio/" method="post">
+			{% csrf_token %}
+			<!-- Se puede agregar el atributo "name" para
+			especificar un nombre al boton, como para poder
+			diferenciarlo en la vista en caso de haber varios. -->
+			<button class="btn btn-outline-secondary mr-3" type="submit">Abrir puerta</button>
+		</form>
+		<!-- Boton que permite ver el stream durante los segundos establecidos en el script. -->
+		<button class="btn btn-outline-secondary ml-3" onclick="timeoutStream()">Ver exterior</button>
+	</div>
+</div>
+
+<!-- Script que muestra el stream durante los segundos establecidos una vez que se presiona el boton, y luego vuelve a poner como fuente de la imagen, la que estaba originalmente. -->
+<script>
+	function timeoutStream() {
+		document.getElementById("stream").setAttribute("src", "http://lac.efn.uncor.edu:443");
+		setTimeout(function() {
+			document.getElementById("stream").setAttribute("src", "{% static 'images/pause-stream.jpg'%}");
+		}, 15000);
+	}
+</script>
+
+{% endblock content %}

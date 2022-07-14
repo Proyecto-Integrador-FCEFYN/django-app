@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+Agregar nuevo usuario
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+<!-- Script extra para mostrar el mensaje de alerta. -->
+<script src="{% static 'users/js/getCode.js' %}"></script>
+
+
+<!-- Pagina para registrar nuevo usuario (paso 3). -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+    <!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <!-- Subtitulo. -->
+        <h5 class="h5 text-info mb-3">Paso 3 de 3 - Tarjeta RFID:</h5>
+        <!-- Barra indicadora del progreso de registro del usuario. -->
+        <div class="progress mb-5">
+            <div class="progress-bar" role="progressbar" style="width: 66%;"></div>
+        </div>
+        <!-- Mensaje de alerta. -->
+        <div class="alert alert-info" role="alert">
+            Este proceso demora unos segundos.
+        </div>
+        <!-- Los botones de acciones, se le ponen nombres para diferenciarlos en la vista. -->
+        <button onclick="getCode()" class="btn btn-outline-secondary mr-3" type="submit" name="get_code">Obtener código</button>
+        <button class="btn btn-outline-secondary" type="submit" name="omit">Omitir</button>
+    </form>
+</div>
+
+{% endblock content %}

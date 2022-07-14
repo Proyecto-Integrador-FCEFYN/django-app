@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang=es>
+
+<head>
+	<!-- Required meta tags (Bootstrap).-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Se incluye el css de Bootstrap. -->
+    {% include 'base/css.html' %}
+	<title>
+		{% block title %}
+			Control de Acceso al LAC
+		{% endblock title %}
+	</title>
+	<!-- Favicon. -->
+	<link rel="shortcut icon" href="{{ BASE_DIR }}/static/images/favicon.ico">
+</head>
+
+<body>
+	<!-- Para utilizar el servidor de archivos estaticos. -->
+	{% load static %}
+
+	<!-- Se incluye el css para las paginas donde el usuario no se encuentra logueado. -->
+	<link rel="stylesheet" type="text/css" href="{% static 'css/anonymous_user.css' %}">
+
+	<!-- Dentro de este bloque va el contenido de cada template que
+	hereda esta pagina. -->
+	{% block content %}{% endblock content %}
+	
+	<!-- Se incluyen los JavaScripts de Bootstrap. -->
+	{% include 'base/js.html' %}
+</body>
+</html>

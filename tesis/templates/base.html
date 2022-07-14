@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang=es>
+
+<head>
+	<!-- Required meta tags (Bootstrap).-->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Se incluye el css de Bootstrap. -->
+	{% include 'base/css.html' %}
+	<!-- Titulo de la pestaña. -->
+	<title>
+		Control de Acceso al LAC
+	</title>
+	<!-- Favicon. -->
+	<link rel="shortcut icon" href="{{ BASE_DIR }}/static/images/favicon.ico">
+</head>
+
+<body>
+	<!-- Barra de navegacion del sitio. -->
+	<!-- Primer barra, se caracteriza por tener el nombre del proyecto (Control de Acceso al LAC) a la izquierda y a la derecha el nombre del usuario logueado. -->
+	<!-- Si la pantalla es mas chica que mediano, desaparece el nombre del usuario ("navbar-expand-md"). -->
+	<!-- Se cambia el color de la barra y el fondo ("navbar-dark" y "bg-dark"). -->
+	<!-- Se saca el padding tanto arriba como abajo para lograr que la barra sea mas pequeña ("py-0").-->
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark py-0">
+		<!-- Titulo del proyecto en color "text-info", funciona tambien como link al inicio. -->
+		<a class="navbar-brand text-info" href="/inicio">Control de Acceso al LAC</a>
+		<!-- Clase donde se van a colocar las opciones del menu. -->
+		<div class="collapse navbar-collapse">
+			<!-- Se da un margen hacia la izquierda para mantener las opciones a la derecha. -->
+			<ul class="navbar-nav ml-auto">
+				<!-- Se coloca unicamente el nombre del usuario en color "text-info". -->
+				<span class="navbar-text text-info">
+					{{ request.user.last_name }}, {{ request.user.first_name }}
+				</span>
+			</ul>
+		</div>
+	</nav>
+	<!-- Segunda barra, se caracteriza por tener a la izquierda el titulo de la pagina y a la derecha las opciones de navegacion. -->
+	<!-- Si la pantalla es mas chica que mediano, se reemplazan las opcioens de navegacion por un boton ("navbar-expand-md" junto con el "navbar-toggler" posterior).-->
+	<!-- Al desplazarse hacia abajo, esta barra se mantiene en la ventana ("sticky-top"). -->
+	<!-- Se agrega un margen abajo para separar un poco mas el contenido de las paginas de la barra. -->
+	<!-- El resto de las opciones son iguales a la primer barra. -->
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark py-0 sticky-top mb-3">
+		<!-- Se coloca el titulo de la pagina. -->
+		<span class="navbar-brand">{% block title %}{% endblock title %}</span>
+		<!-- En caso de redimensionar la ventana, las opciones del menu de navegacion
+		se colocan dentro de un boton. -->
+		<button class="navbar-toggler px-2 py-0" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<!-- El icono a mostrar en caso de aparecer el boton. -->
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<!-- Clase donde se van a colocar las opciones del menu, tiene un id para indicar al toggler que es esta la clase que debe accionar. -->
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="/inicio">Inicio</a>
+				</li>
+				<!-- Si el usuario es admin se agregan los menus desplegables de eventos y usuarios. -->
+				{% if request.user.is_staff %}
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="eventsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Eventos</a>
+					<div class="dropdown-menu" aria-labelledby="eventsDropdown">
+						<a class="dropdown-item" href="/eventos/acceso-denegado">Accesos denegados</a>
+						<a class="dropdown-item" href="/eventos/apertura-web">Aperturas de puerta via web</a>
+						<a class="dropdown-item" href="/eventos/movimiento">Detecciones de movimiento</a>
+						<a class="dropdown-item" href="/eventos/acceso-permitido">Ingresos con llavero</a>
+						<a class="dropdown-item" href="/eventos/timbre">Toques de timbre</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Usuarios</a>
+					<div class="dropdown-menu" aria-labelledby="usersDropdown">
+						<a class="dropdown-item" href="/usuarios/registro-paso-1">Agregar nuevo usuario</a>
+						<a class="dropdown-item" href="/usuarios/franjas-horarias">Franjas horarias</a>
+						<a class="dropdown-item" href="/usuarios/lista">Usuarios registrados</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopu="true" aria-expanded="false">Herramientas</a>
+					<div class="dropdown-menu" aria-labelledby="toolsDropdown">
+						<a class="dropdown-item" href="/herramientas/almacenamiento">Almacenamiento</a>
+						<a class="dropdown-item" href="/herramientas/borrado-eventos/1">Borrado de eventos</a>
+						<a class="dropdown-item" href="/herramientas/copia-seguridad">Copia de seguridad</a>
+						<a class="dropdown-item" href="/herramientas/sensor-movimiento/1">Sensor de movimiento</a>
+					</div>
+				</li>
+				<!-- Si el usuario no es admin. -->
+				{% else %}
+				{% endif %}
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="usersDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mi usuario</a>
+					<!-- Se especifica el "dropdown-menu-right" para que las opciones se desplieguen alineadas a la derecha, cosa de no sobresalir de la pantalla debido a que estas opciones son las ultimas de la barra. -->
+					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="usersDropdown">
+						<a class="dropdown-item" href="/usuarios/cambiar-clave">Cambiar contraseña</a>
+						<a class="dropdown-item" href="/salir">Cerrar sesión</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+
+	<!-- Dentro de este bloque va el contenido de cada template que
+	hereda esta pagina. -->
+	{% block content %}{% endblock content %}
+	<!-- Se incluyen los JavaScripts de Bootstrap. -->
+	{% include 'base/js.html' %}
+</body>
+</html>

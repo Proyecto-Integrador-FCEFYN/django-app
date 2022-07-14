@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}
+Eventos del usuario
+{% endblock title %}
+
+{% block content %}
+
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+
+<style>
+	.modal-lg {
+    	max-width: 700px;
+	}
+</style>
+
+
+
+<!-- Pagina donde se listan los eventos del usuario. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<!-- Los grupos de datos se acomodan dentro de este contenedor de tipo responsive. -->
+    <!-- Se resta margen de arriba para lograr que el jumbotron se pegue a la barra de navegacion.-->
+    <div class="container-responsive" style="margin-top: -16px;">
+        <!-- Menu de herramientas. -->
+        <div class="row">
+            <div class="col p-0">
+                <div class="jumbotron p-2">
+                	<button class="btn btn-outline-secondary m-2" type="button" data-toggle="collapse" data-target="#dateFilterEvents" aria-expanded="false" aria-controls="dateFilterEvents">
+            			Filtrar por fechas
+		        	</button>
+		        	<button class="btn btn-outline-secondary my-2 ml-2 mr-1" type="button" data-toggle="collapse" data-target="#typeFilterEvents" aria-expanded="false" aria-controls="typeFilterEvents">
+		        		Filtrar por tipo de evento
+		        	</button>
+			        <!-- Formulario. -->
+			        <form class="form-group collapse" method="post" id="dateFilterEvents">
+			        	<hr>
+			            {% csrf_token %}
+			            <div class="jumbotron pb-0 pt-4">
+			                <div class="row">
+								<div class="col-3 col-sm-3 col-md-1 col-lg-1">
+									<div class="text-secondary">
+										Desde:
+									</div>
+								</div>
+								<div class="col-9 col-sm-8 col-md-4 col-lg-3">
+									<input class="form-control" type="date" value="{{ begin }}" name="begin_date">
+								</div>
+								<div class="col-3 col-sm-3 col-md-1 col-lg-1">
+									<div class="text-secondary">
+										Hasta:
+									</div>
+								</div>
+								<div class="col-9 col-sm-8 col-md-4 col-lg-3">
+									<input class="form-control" type="date" value="{{ end }}" name="end_date">
+								</div>
+								<div class="col-2 col-sm-6 col-md-2 col-lg-2">
+									<button class="btn btn-outline-secondary mt-2 mt-sm-0" type="submit" name="filter"><span class="fa fa-calendar"></span> Filtrar</button>
+									<input type="hidden" name="event_selected" value="{{ event_selected }}">
+								</div>
+							</div>
+			            </div>
+			        </form>
+			        <form class="form-group collapse" method="post" id="typeFilterEvents">
+			        	<hr>
+			        	{% csrf_token %}
+			            <div class="jumbotron pb-0 pt-4">
+			            	<div class="row">
+			            		<div class="col-12 col-sm-5 col-md-3">
+					                <select class="custom-select" name="event_selected">
+										<!-- Dependiendo del evento seleccionado, se muestra dicha opcion por defecto -->
+										{% if event_selected == "all" %}
+										<option selected value="all">Todos</option>
+										<option value="key">Ingresos con llavero</option>
+										<option value="web">Aperturas de puerta via web</option>
+										{% elif event_selected == "key" %}
+										<option value="all">Todos</option>
+										<option selected value="key">Ingresos con llavero</option>
+										<option value="web">Aperturas de puerta via web</option>
+										{% elif event_selected == "web" %}
+										<option value="all">Todos</option>
+										<option value="key">Ingresos con llavero</option>
+										<option selected value="web">Aperturas de puerta via web</option>
+										{% else %}
+										<option value="all">Todos</option>
+										<option value="key">Ingresos con llavero</option>
+										<option value="web">Aperturas de puerta via web</option>
+										{% endif %}
+									</select>
+								</div>
+								<div class="col-12 col-sm-2">
+									<button class="btn btn-outline-secondary mt-2 mt-sm-0" type="submit" name="filter"><span class="fa fa-list"></span> Filtrar</button>
+									<input type="hidden" name="begin_date" value="{{ begin }}">
+									<input type="hidden" name="end_date" value="{{ end }}">
+								</div>
+							</div>
+			            </div>
+			        </form>
+			    </div>
+			</div>
+		</div>
+
+		<!-- Lista de eventos. -->
+		<div class="row">
+			<div class="col">
+				<!-- Subtitulo de la pagina. -->
+				<h5 class="h5 text-info mb-3">
+				{% if begin == '' and end == '' or not begin and not end%}
+					Se muestran todos los ítems del usuario {{ user_name }}
+				{% elif begin == date_today and end == '' %}
+					Se muestran los ítems del dia de hoy del usuario {{ user_name }}
+				{% elif begin == '' %}
+					Se muestran los ítems antes del {{ end_formatted }} del usuario {{ user_name }}
+				{% elif end == '' %}
+					Se muestran los ítems despues del {{ begin_formatted }} del usuario {{ user_name }}
+				{% else %}
+					Se muestran los ítems entre {{ begin_formatted }} y {{ end_formatted }} del usuario {{ user_name }}
+				{% endif %}
+				</h5>
+				<table class="table table-hover table-responsive">
+					<thead>
+						<tr>
+							<th>Fecha y hora</th>
+							<th>Tipo de evento</th>
+							<th>Miniatura</th>
+							<th>Ampliar</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for obj in object_list %}
+							<tr>
+								<td>{{ obj.date_time }}</td>
+								<td>
+									{% if "WebOpenDoor" in obj.get_name %}Apertura de puerta via web
+									{% elif "PermittedAccess" in obj.get_name %}Ingreso con llavero
+									{% else %}No se pudo determinar el tipo de evento
+									{% endif %}
+								<td>
+									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{% static obj.image %}" alt="No se encontro la imagen">
+								</td>
+								<td>
+									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ obj.image }}"><span class="fa fa-image"></span></button>
+								</td>
+							</tr>
+							<!-- Modal. -->
+							<div class="modal fade" id="{{ obj.image }}" tabindex="-1" role="dialog" aria-labelledby="imageTitle" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title" id="imageTitle">{{ obj.date_time }}</h5>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body mx-auto">
+											<img class="img-fluid rounded" src="{% static obj.image %}" alt="No se encontro la imagen">
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% include "snippets/pagination.html" %}
+
+{% endblock content %}

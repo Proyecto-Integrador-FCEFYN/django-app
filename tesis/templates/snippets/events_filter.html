@@ -1,0 +1,22 @@
+<!-- Filtro de fechas para los eventos, va dentro del Jumbotron. -->
+<div class="row">
+	<div class="col-3 col-sm-3 col-md-1 col-lg-1">
+		<div class="text-secondary">
+			Desde:
+		</div>
+	</div>
+	<div class="col-9 col-sm-8 col-md-4 col-lg-3">
+		<input class="form-control" type="date" value="{{ begin }}" name="begin_date">
+	</div>
+	<div class="col-3 col-sm-3 col-md-1 col-lg-1">
+		<div class="text-secondary">
+			Hasta:
+		</div>
+	</div>
+	<div class="col-9 col-sm-8 col-md-4 col-lg-3">
+		<input class="form-control" type="date" value="{{ end }}" name="end_date">
+	</div>
+	<div class="col-2 col-sm-6 col-md-2 col-lg-2 mt-2 mt-sm-0">
+		<button class="btn btn-outline-secondary" type="submit" name="date_filter"><span class="fa fa-calendar"></span> Filtrar</button>
+	</div>
+</div>

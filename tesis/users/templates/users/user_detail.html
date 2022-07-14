@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}
+Perfil de usuario
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina donde se muestra el perfil del usuario. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<h5 class="h5 text-info mt-2 mb-3">Datos personales:</h5>
+	<!-- Esta tabla no se puede recorrer con un bucle for debido a que no se utilizan todos los datos del formulario pasado como contexto, y tampoco es posible recorrer cierta parte del bucle y desp hacer un break, por lo que esta es la solucion utilizada. -->
+	<table class="table table-responsive mb-4">
+		<tbody>
+			<tr>
+				<th>Nombre:</th>
+				<td>{{ user.first_name }}</td>
+			</tr>
+			<tr>
+				<th>Apellido:</th>
+				<td>{{ user.last_name }}</td>
+			</tr>
+			<tr>
+				<th>Email:</th>
+				<td>{{ user.email }}</td>
+			</tr>
+			<tr>
+				<th>DNI:</th>
+				<td>{{ user.identity }}</td>
+			</tr>
+			<tr>
+				<th>Teléfono:</th>
+				<td>{{ user.phone }}</td>
+			</tr>
+			<tr>
+				<th>Fecha y hora de alta:</th>
+				<td>{{ user.date_joined }}</td>
+			</tr>
+			<tr>
+				<th>Última conexión:</th>
+				<td>
+					{% if user.last_login != None %}
+						{{ user.last_login }}
+					{% else %}
+						No hay registro de ingreso al sistema web
+					{% endif %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	{% if not user.is_staff %}
+		<h5 class="h5 text-info mt-2 mb-3">Fecha límite y franjas:</h5>
+		<!-- Este caso es similar a la tabla anterior, ademas de que los dias de la semana tienen que ser escritos a mano ya que en el modelo estan en ingles. -->
+		<table class="table table-responsive mb-4">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Lunes</th>
+					<th>Martes</th>
+					<th>Miércoles</th>
+					<th>Jueves</th>
+					<th>Viernes</th>
+					<th>Sábado</th>
+					<th>Domingo</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Turno:</th>
+					<td>{{ user.monday }}</td>
+					<td>{{ user.tuesday }}</td>
+					<td>{{ user.wednesday }}</td>
+					<td>{{ user.thursday }}</td>
+					<td>{{ user.friday }}</td>
+					<td>{{ user.saturday }}</td>
+					<td>{{ user.sunday }}</td>
+				</tr>
+				<tr>
+					<th>Desde:</th>
+					<td>{{ user.monday.begin }}</td>
+					<td>{{ user.tuesday.begin }}</td>
+					<td>{{ user.wednesday.begin }}</td>
+					<td>{{ user.thursday.begin }}</td>
+					<td>{{ user.friday.begin }}</td>
+					<td>{{ user.saturday.begin }}</td>
+					<td>{{ user.sunday.begin }}</td>
+				</tr>
+				<tr>
+					<th>Hasta:</th>
+					<td>{{ user.monday.end }}</td>
+					<td>{{ user.tuesday.end }}</td>
+					<td>{{ user.wednesday.end }}</td>
+					<td>{{ user.thursday.end }}</td>
+					<td>{{ user.friday.end }}</td>
+					<td>{{ user.saturday.end }}</td>
+					<td>{{ user.sunday.end }}</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table table-responsive mb-4">
+			<tbody>
+				<tr>
+					<th>Fecha de expiración de actividad:</th>
+					<td>{{ user.expiration_date }}</td>
+				</tr>
+			</tbody>
+		</table>
+	{% endif %}
+	<div class="mb-3">
+		<a class="btn btn-outline-secondary m-1" href="/usuarios/editar/{{ user.id }}">Modificar datos</a>
+		<a class="btn btn-outline-secondary m-1" href="/usuarios/registro-paso-3/{{ user.id }}">Cambiar llavero</a>
+		<a class="btn btn-outline-secondary m-1" href="/eventos/usuario/{{ user.id }}">Ver eventos</a>
+	</div>
+	<a class="text-info" href="/usuarios/lista">Volver atrás</a>
+</div>
+
+{% endblock content %}

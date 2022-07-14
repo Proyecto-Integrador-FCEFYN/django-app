@@ -1,0 +1,31 @@
+{% extends "base_login.html" %}
+
+{% block content %}
+
+<!-- Para django-bootstrap4. -->
+{% load bootstrap4 %}
+
+
+<!-- Pagina para recuperar el nombre de usuario mediante DNI. -->
+<div class="text-center my-auto">
+	<form class="form-signin" method="post">
+		{% csrf_token %}
+		<h1 class="h3 mb-3">Olvidé mi usuario</h1>
+		<div class="alert alert-primary text-left" role="alert">
+			Ingrese el DNI para conocer el nombre del usuario.
+		</div>
+		{% for field in form.visible_fields %}
+            <div class="form-group">
+                {% bootstrap_field field show_label=False %}
+            </div>
+        {% endfor %}
+        <button class="btn btn-lg btn-primary btn-block mb-2" type="submit">Comprobar</button>
+        <div class="text clearfix">
+            <a class="float-left" href="/acceder">Volver atrás</a>
+        </div>
+        <!-- Se incluyen los logos de la facultad y de la universidad. -->
+        {% include 'snippets/logos.html' %}
+    </form>
+</div>
+
+{% endblock content %}

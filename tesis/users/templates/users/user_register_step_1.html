@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}
+Agregar nuevo usuario
+{% endblock title %}
+
+{% block content %}
+
+<!-- Para django-bootstrap4. -->
+{% load bootstrap4 %}
+
+
+<!-- Se especifica un margen hacia arriba especifico para los textos de errores
+de los campos de los formularios. Este margen depende del tamaño de la ventana
+del dispositivo. -->
+<style>
+    .auto-top-margin {margin-top:-16px}
+    @media (min-width: 576px) {
+        .auto-top-margin {margin-top:0px}
+    }
+</style>
+
+<!-- Pagina para registrar nuevo usuario (paso 1). -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+
+    <!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <!-- Subtitulo. -->
+        <h5 class="h5 text-info mb-3">Paso 1 de 3 - Datos personales:</h5>
+        <!-- Barra indicadora del progreso de registro del usuario. -->
+        <div class="progress mb-5">
+            <div class="progress-bar" role="progressbar" style="width: 0%;"></div>
+        </div>
+        <!-- El formulario de Django se acomoda dentro de esta clase. -->
+        <div class="form-group">
+            <!-- Se recorren los campos visibles del formulario. -->
+            {% for field in form.visible_fields %}
+            <div class="row">
+                <!-- En pantallas pequeñas ocupa toda la fila, en medianas en adelante solo 4 columnas. -->
+                <div class="col-12 col-sm-4">
+                    <!-- La etiqueta del campo. -->
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                    </div>
+                </div>
+                <!-- En pantallas pequeñas utiliza toda la fila y en medianas en adelante 8 columnas. Se utiliza el CSS propio para los margenes hacia arriba. -->
+                <div class="col-12 col-sm-8 auto-top-margin">
+                    <!-- Si el formulario contiene errores, los recorre y los muestra. -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <!-- Se justifica el contenido del texto hacia la izquierda. -->
+                                <div class="text-left">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <!-- Se recorren los campos visibles del formulario y se los muestran sin la etiqueta, sin texto predefinido (placeholder) y sin ayuda. -->
+                    <div class="form-group">
+                        {% bootstrap_field field show_label=False show_help=False placeholder=False %}
+                        <!-- Se verifica si el campo del formulario tiene texto de ayuda,
+                        en caso de ser cierto, se lo agrega con un margen hacia arriba
+                        reducido para mejor visibilidad. -->
+                        {% if field.help_text %}
+                            <!-- Se da formato al texto de ayuda del campo. -->
+                            <div style="margin-top:-16px;">
+                                <small class="text-muted">{{ field.help_text }}</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="btn btn-outline-secondary" type="submit">Siguiente</button>
+    </form>
+</div>
+
+{% endblock content %}

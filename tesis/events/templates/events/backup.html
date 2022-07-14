@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+Copia de seguridad
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina donde se puede realizar la copia de seguridad del sistema. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<div class="col-12 col-md-5">
+		<!-- Subtitulo para la copia integral del sistema. -->
+		<h5 class="h5 text-info">Copia de seguridad del sistema integral:</h5>
+		<div class="alert alert-light pl-0">Se realiza una copia de todos los archivos y se colocan dentro de un archivo de tipo zip para su descarga directa.</div>
+		<button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#confirmationModal">
+			<span class="fa fa-clone"></span> Realizar copia de todo el sistema
+		</button>
+		<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalTitle" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="confirmationModalTitle">Advertencia</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<p>Durante este proceso el sistema web no puede ser utilizado.</p>
+						<p>El tiempo que demora depende de la cantidad de eventos registrados.</p>
+					</div>
+					<div class="modal-footer">
+						<!-- Formulario. -->
+					    <form class="form-group" method="post">
+					        {% csrf_token %}
+					        <button class="btn btn-outline-secondary" type="submit" name="complete_backup">Realizar copia de todas formas</button>
+					    </form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		
+	    <!-- Subtitulo para la copia de la base de datos unicamente. -->
+	   	<h5 class="h5 text-info mt-5">Copia de seguridad de la base de datos:</h5>
+	   	<div class="alert alert-light pl-0">Se realiza una copia de la actual base de datos y se coloca dentro de un archivo de tipo zip para su descarga directa.</div>
+	   	<!-- Formulario. -->
+	    <form class="form-group" method="post">
+	        {% csrf_token %}
+	        <button class="btn btn-outline-secondary" type="submit" name="database_backup"><span class="fa fa-clone"></span> Realizar copia de la base de datos</button>
+	    </form>
+	</div>
+</div>
+
+{% endblock content %}

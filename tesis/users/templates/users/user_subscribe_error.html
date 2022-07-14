@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+Conflicto al dar de alta
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina de error al dar de alta al usuario cuando existe otro con el mismo codigo RFID. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+
+	<div class="alert alert-warning" role="alert">
+		No se puede dar de alta al usuario <a href="/usuarios/perfil/{{ actual_user_id }}" class="alert-link">{{ actual_user }}</a> debido a que el usuario <a href="/usuarios/perfil/{{ compare_user_id }}" class="alert-link">{{ compare_user }}</a> tiene el mismo código de tarjeta RFID y se encuentra activo.<br>
+		Si desea se lo puede <a href="/usuarios/dar-baja/{{ compare_user_id }}-{{ actual_user_id }}" class="alert-link">dar de baja</a> a este último para dar el alta al primero.
+	</div>
+	<a class="text-info" href="/usuarios/lista">Volver atrás</a>
+</div>
+
+{% endblock content %}

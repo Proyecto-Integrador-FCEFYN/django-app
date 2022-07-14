@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}
+Usuarios registrados
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Se agrega el boton de cancelar para los formularios de tipo "search" que el CSS de Bootstrap lo resetea. Tambien se modifica para que en caso de que en la lista de usuarios se presione el boton de opciones cerca del final de la tabla, no se recorte el menu desplegable. -->
+<style>
+    input[type="search"]::-webkit-search-cancel-button {
+        -webkit-appearance: searchfield-cancel-button;
+    }
+</style>
+
+
+
+<!-- Pagina donde se listan los usuarios registrados. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+    <!-- Los grupos de datos se acomodan dentro de este contenedor de tipo responsive. -->
+    <!-- Se resta margen de arriba para lograr que el jumbotron se pegue a la barra de navegacion.-->
+    <div class="container-responsive" style="margin-top: -16px;">
+        <!-- Menu de herramientas. -->
+        <div class="row">
+            <div class="col p-0">
+                <div class="jumbotron p-2">
+                    <button class="btn btn-outline-secondary m-2" type="button" data-toggle="collapse" data-target="#searchUser" aria-expanded="false" aria-controls="searchUser">
+                        Buscar usuario
+                    </button>
+                    <button class="btn btn-outline-secondary m-2" type="button" data-toggle="collapse" data-target="#exportUsers" aria-expanded="false" aria-controls="exportUsers">
+                        Exportar usuarios
+                    </button>
+                    <!-- Formulario. -->
+                    <form class="form-group collapse" method="post" id="searchUser">
+                        <hr>
+                        {% csrf_token %}
+                        <div class="jumbotron pb-0 pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-4 col-lg-3">
+                                    <h5 class="h5 text-secondary">Ingresar nombre o apellido:</h5>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <input class="form-control" aria-label="Search" type="search" value="{{ name_search }}" name="search_user">
+                                </div>
+                                <div class="col-6 col-md-2 col-lg-2">
+                                    <button class="btn btn-outline-secondary" type="submit" name="search"><span class="fa fa-search"></span> Buscar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <form class="form-group collapse" method="post" id="exportUsers">
+                        <hr>
+                        {% csrf_token %}
+                        <div class="jumbotron pb-0 pt-4">
+                            <div class="row">
+                                <input type="hidden" value="{{ name_search }}" name="search_user">
+                                <button class="btn btn-outline-secondary mx-2 mb-1 mb-sm-0" type="submit" name="export_active"><span class="fa fa-file-text-o"></span> Exportar los usuarios activos</button>
+                                <button class="btn btn-outline-secondary mx-2" type="submit" name="export_all"><span class="fa fa-file-text-o"></span> Exportar todos los usuarios</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <!-- Subtitulo. -->
+                {% if name_search %}
+                    <h5 class="h5 text-info mb-3">Se muestran los resultados de la búsqueda "{{ name_search }}":</h5>
+                {% else %}
+                    <h5 class="h5 text-info mb-3">Se muestran todos los usuarios:</h5>
+                {% endif %}
+                <table class="table table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <!-- Se especifica un minimo de ancho para la columna para que el titulo no se separe por palabras en caso de achicarse la tabla, por ejemplo en pantallas de celulares. -->
+                            <th style="min-width:178px;">Fecha y hora de alta</th>
+                            <th>Activo</th>
+                            <th>Admin</th>
+                            <th>Opciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se puede utilizar como variable de contexto por defecto tanto "object_list" como asi tambien "user_list". -->
+                        {% for user in user_list %}
+                            <tr>
+                                <td>{{ user.first_name }}</td>
+                                <td>{{ user.last_name }}</td>
+                                <td>{{ user.date_joined }}</td>
+                                <!-- Se utilizan solo para indicar el valor tanto de "is_staff" como "is_active". -->
+                                <td class="text-center">
+                                    {% if user.is_active %}
+                                        <span class="fa fa fa-check"></span>
+                                    {% else %}
+                                        <span class="fa fa-close"></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if user.is_staff %}
+                                        <span class="fa fa fa-check"></span>
+                                    {% else %}
+                                        <span class="fa fa-close"></span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Se utiliza "dropleft" en vez de "dropdown" debido a que si hay un solo usuario en la lista, el menu desplegable con "dropdown" aparece cortado (es un bug reportado en Bootstrap). -->
+                                    <div class="dropleft text-center">
+                                        <button class="btn btn-outline-secondary dropdown-toggle py-0" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopu="true" aria-expande="false"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="/usuarios/perfil/{{ user.id }}">Ver perfil</a>
+                                            <a class="dropdown-item" href="/eventos/usuario/{{ user.id }}">Ver eventos</a>
+                                            <a class="dropdown-item" href="/usuarios/dar-baja/{{ user.id }}-{{ user.id }}">Dar de baja</a>
+                                            <a class="dropdown-item" href="/usuarios/dar-alta/{{ user.id }}">Dar de alta</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "snippets/pagination.html" %}
+
+{% endblock content %}

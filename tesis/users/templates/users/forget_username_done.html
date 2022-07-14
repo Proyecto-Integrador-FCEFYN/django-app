@@ -1,0 +1,25 @@
+{% extends "base_login.html" %}
+
+{% block content %}
+
+
+<!-- Pagina que muestra el resultado para el DNI ingresado. -->
+<div class="text-center my-auto">
+	<div class="form-signin">
+		<h1 class="h3 mb-3">Olvidé mi usuario</h1>
+		<div class="alert alert-primary text-left" role="alert">
+			{% if email %}
+				El DNI: <strong>{{ identity }}</strong> está asociado a la cuenta: <strong>{{ email }}</strong> y se encuentra actualmente en estado {% if is_active %}<strong>activo</strong>{% else %}<strong>inactivo</strong>{% endif %}.
+			{% else %}
+				No existe un usuario con el DNI <strong>{{ identity }}</strong> en el sistema.
+			{% endif %}
+		</div>
+		<div class="text clearfix">
+	   	    <a class="float-left" href="/acceder/olvide-usuario">Volver atrás</a>
+	    </div>
+	    <!-- Se incluyen los logos de la facultad y de la universidad. -->
+        {% include 'snippets/logos.html' %}
+	</div>
+</div>
+
+{% endblock content %}

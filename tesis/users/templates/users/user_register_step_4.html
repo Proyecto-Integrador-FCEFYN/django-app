@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+Agregar nuevo usuario
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina para registrar nuevo usuario (paso 4 - finalizado). -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+    <!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <!-- Subtitulo. -->
+        <h5 class="h5 text-info mb-3">Finalización de creación de usuario:</h5>
+        <!-- Barra indicadora del progreso de registro del usuario. -->
+        <div class="progress mb-5">
+            <div class="progress-bar" role="progressbar" style="width: 100%;"></div>
+        </div>
+    <div class="alert alert-success" role="alert">
+    	Usuario registrado con éxito.<br>
+    	La contraseña ha sido enviada al email.
+    </div>
+    <!-- Boton para ir al inicio. -->
+    <a class="btn btn-outline-secondary" href="/inicio">Aceptar</a>
+
+{% endblock content %}

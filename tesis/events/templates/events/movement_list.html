@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}
+Detecciones de movimiento
+{% endblock title %}
+
+{% block content %}
+
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+
+<style>
+	.modal-lg {
+    	max-width: 700px;
+	}
+</style>
+
+<!-- Pagina donde se listan los eventos. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<!-- Los grupos de datos se acomodan dentro de este contenedor de tipo responsive. -->
+    <!-- Se resta margen de arriba para lograr que el jumbotron se pegue a la barra de navegacion.-->
+    <div class="container-responsive" style="margin-top: -16px;">
+        <!-- Menu de herramientas. -->
+        <div class="row">
+            <div class="col p-0">
+                <div class="jumbotron p-2">
+                	<button class="btn btn-outline-secondary m-2" type="button" data-toggle="collapse" data-target="#filterEvents" aria-expanded="false" aria-controls="filterEvents">
+            			Filtrar por fechas
+		        	</button>
+		        	<button class="btn btn-outline-secondary my-2 ml-2 mr-1" type="button" data-toggle="collapse" data-target="#exportEvents" aria-expanded="false" aria-controls="exportEvents">
+		        		Exportar eventos
+		        	</button>
+			        <!-- Formulario. -->
+			        <form class="form-group collapse" method="post" id="filterEvents">
+			        	<hr>
+			            {% csrf_token %}
+			            <div class="jumbotron pb-0 pt-4">
+			                {% include "snippets/events_filter.html" %}
+			            </div>
+			        </form>
+			        <form class="form-group collapse" method="post" id="exportEvents">
+			        	<hr>
+			        	{% csrf_token %}
+			            <div class="jumbotron pb-0 pt-4">
+			                {% include "snippets/events_export.html" %}
+			            </div>
+			        </form>
+			    </div>
+			</div>
+		</div>
+
+		<!-- Lista de eventos. -->
+		<div class="row">
+			<div class="col">
+				{% include "snippets/events_titles.html" %}
+				<table class="table table-hover table-responsive">
+					<thead>
+						<tr>
+							<th>Fecha y hora</th>
+							<th>Miniatura</th>
+							<th>Ampliar</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for obj in object_list %}
+							<tr>
+								<td>{{ obj.date_time }}</td>
+								<td>
+									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{% static obj.image %}" alt="No se encontro la imagen">
+								</td>
+								<td>
+									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ obj.image }}"><span class="fa fa-image"></span></button>
+								</td>
+							</tr>
+							<!-- Modal. -->
+							<div class="modal fade" id="{{ obj.image }}" tabindex="-1" role="dialog" aria-labelledby="imageTitle" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title" id="imageTitle">{{ obj.date_time }}</h5>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body mx-auto">
+											<img class="img-fluid rounded" src="{% static obj.image %}" alt="No se encontro la imagen">
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% include "snippets/pagination.html" %}
+
+{% endblock content %}

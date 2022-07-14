@@ -1,0 +1,28 @@
+{% extends "base_login.html" %}
+
+{% block content %}
+
+<!-- Para django-bootstrap4. -->
+{% load bootstrap4 %}
+
+
+<!-- Pagina de inicializacion del sistema. -->
+<div class="text-center my-auto">
+    <div class="form-signin">
+        {% csrf_token %}
+        <h1 class="h3 mb-3">Inicialización del sistema</h1>
+        <div class="alert alert-primary text-left" role="alert">
+        	{% if not init %}
+        		El sistema ya fue inicializado.
+        	{% else %}
+        		Sistema inicializado con éxito. Se han creado las franjas horarias por defecto y un usuario capaz de utilizar el sistema para la creación de el primer usuario, su nombre de usuario es <strong>{{ user }}</strong> y su contraseña es <strong>{{ password }}</strong>
+                <br>
+        		<a href="{% url 'users:login' %}" class="alert-link">Ingresar ahora</a>
+			{% endif %}
+		</div>
+        <!-- Se incluyen los logos de la facultad y de la universidad. -->
+        {% include 'snippets/logos.html' %}
+    </div>
+</div>
+
+{% endblock content %}

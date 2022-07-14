@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}
+Modificar datos del usuario
+{% endblock title %}
+
+{% block content %}
+
+<!-- Para django-bootstrap4. -->
+{% load bootstrap4 %}
+
+
+<!-- Pagina donde se editan los datos del usuario. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+		<h5 class="h5 text-info mt-2 mb-4">Datos personales</h5>
+		<!-- El formulario de Django se acomoda dentro de esta clase. -->
+		<!-- Este formulario no se puede recorrer con un bucle for debido a que no se utilizan todos los datos del mismo que fueron pasado como contexto, y tampoco es posible recorrer cierta parte del bucle y desp hacer un break, por lo que esta es la solucion utilizada. -->
+        <div class="form-group">
+        	<!-- Datos personales. -->
+        	<div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.first_name.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+	        		{% bootstrap_field form.first_name show_label=False show_help=False placeholder=False %}
+	        	</div>
+	        </div>
+	        <div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.last_name.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+	        		{% bootstrap_field form.last_name show_label=False show_help=False placeholder=False %}
+	        	</div>
+	        </div>
+	        <div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.email.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+	        		{% bootstrap_field form.email show_label=False show_help=False placeholder=False %}
+	        	</div>
+	        </div>
+	        <div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.identity.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+	        		{% bootstrap_field form.identity show_label=False show_help=False placeholder=False %}
+	        	</div>
+	        </div>
+	        <div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.phone.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+	        		{% bootstrap_field form.phone show_label=False show_help=False placeholder=False %}
+	        	</div>
+	        </div>
+	        <div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.is_staff.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+	        		{% bootstrap_field form.is_staff show_label=False show_help=False placeholder=False %}
+	        	</div>
+	        </div>
+
+	        <!-- Si el usuario no es administrador se muestran las franjas horarias y la fecha limite. -->
+	        {% if not user.is_staff %}
+
+	        <!-- Franjas horarias. -->
+		    <div class="row mt-2">
+			    <div class="col-12 col-sm-6 col-md-4">
+			    	<h5 class="h5 text-info mt-2 mb-4">Franjas horarias</h5>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.monday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.monday show_label=False %}
+			            </div>
+			        </div>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.tuesday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.tuesday show_label=False %}
+			            </div>
+			        </div>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.wednesday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.wednesday show_label=False %}
+			            </div>
+			        </div>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.thursday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.thursday show_label=False %}
+			            </div>
+			        </div>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.friday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.friday show_label=False %}
+			            </div>
+			        </div>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.saturday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.saturday show_label=False %}
+			            </div>
+			        </div>
+			        <div class="row">
+			            <div class="col-4">
+			                {{ form.sunday.label_tag }}
+			            </div>
+			            <div class="col-8">
+			                {% bootstrap_field form.sunday show_label=False %}
+			            </div>
+			        </div>
+			    </div>
+			    <!-- Idem al caso anterior. -->
+		        <div class="col-12 col-sm-5 col-md-3">
+		            <h5 class="h5 text-info mt-2 mb-3" style="min-width:200px;">Turnos y horarios</h5>
+		            <table class="table table-sm text-secondary">
+		                <thead>
+		                    <tr>
+		                        <th scope="col" style="min-width:146px;">Nombre del turno</th>
+		                        <th scope="col">Desde</th>
+		                        <th scope="col">Hasta</th>
+		                    </tr>
+		                </thead>
+		                <tbody>
+		                    {% for tz in time_zone %}
+		                        <tr>
+		                            <td>{{ tz.zone_name }}</td>
+		                            <td>{{ tz.begin }}</td>
+		                            <td>{{ tz.end }}</td>
+		                        </tr>
+		                    {% endfor %}
+		                </tbody>
+		            </table>
+		        </div>
+		    </div>
+		    <!-- Fecha limite. -->
+		    <div class="row mt-2">
+			    <div class="col-12 col-sm-6 col-md-5 col-lg-4">
+			    	<h5 class="h5 text-info mt-2 mb-3">Fecha límite</h5>
+		            <div class="row">
+		                <div class="col-6">
+		                    {{ form.expiration_date.label_tag }}
+		                </div>
+		                <!-- En pantallas pequeñas utiliza 6 columnas, en pantallas mediantes en adelante solo 4. -->
+		                <div class="col-6">
+		                    {% bootstrap_field form.expiration_date show_label=False show_help=False %}
+		                    <div style="margin-top: -16px;">
+		                    	<small class="text-muted">{{ form.expiration_date.help_text }}</small>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		    {% endif %}
+		</div>
+	    <button class="btn btn-outline-secondary" type="submit"><span class="fa fa-save"></span>  Guardar</button>
+    </form>
+    <a class="text-info" href="/usuarios/perfil/{{ user.id }}">Volver atrás</a>
+</div>
+	
+
+{% endblock content %}

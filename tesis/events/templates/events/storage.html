@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+Almacenamiento
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina que muestra el almacenamiento actual del sistema. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<div class="col-12 col-md-5">
+		<!-- Subtitulo para la copia integral del sistema. -->
+		<h5 class="h5 text-info">Estado del almacenamiento del sistema</h5>
+		<div class="progress mt-3" style="height: 25px;">
+			<div class="progress-bar bg-dark" role="progressbar" style="width: {{ used_percentage }}%;">{{ used_percentage }}%
+			</div>
+		</div>
+		<div class="alert alert-light pl-0 mt-2">
+			Total: <span class="font-weight-bold">{{ total }}GB</span>.<br>
+			Disponible: <span class="font-weight-bold">{{ free }}GB</span>.
+		</div>
+	</div>
+</div>
+
+{% endblock content %}

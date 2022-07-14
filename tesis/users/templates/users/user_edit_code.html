@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+Cambiar llavero del usuario
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+<script src="{% static 'users/js/getCode.js' %}"></script>
+
+
+<!-- Pagina donde se permite cambiar el llavero. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+	<!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <!-- Se pasa este parametro oculto para indicar que se trata de una edicion y no de un registro de un nuevo usuario. -->
+        <input type="hidden" name="edit" value="1">
+        <button class="btn btn-outline-secondary m-2" type="submit" onclick="getCode()" name="get_code">
+        Obtener nuevo código</button>
+        <button class="btn btn-outline-secondary m-2" type="submit" name="delete_code">Eliminar código actual</button>
+    </form>
+</div>
+
+{% endblock content %}
