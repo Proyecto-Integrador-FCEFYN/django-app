@@ -22,6 +22,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, RedirectView
 # Vista generica para actualizar campos de los modelos.
 from django.views.generic.edit import UpdateView
+import paho.mqtt.publish as publish
 
 # Se importan los modelos de esta aplicacion, que consisten en los eventos.
 from .models import *
@@ -157,16 +158,21 @@ class HomeView(LoginRequiredMixin, View):
 	# y se envia la clave primaria del usuario que presiono el boton para ser registrado
 	# en la base de datos.
 	def post(self, request):
-		HOST = '127.0.1.1'
-		PORT = 50000
-		data = str(request.user.pk)
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((HOST, PORT))
-		# Se envia el mensaje ("data") hasta que se haya enviado todo o hasta que
-		# ocurra un error. 
-		s.sendall(data)
-		# Se cierra el socket.
-		s.close()
+
+		# El numero de placa deberia venir en un selector para elegir
+		# por lo tanto deberia haber un registro de placas en la base
+		device = 'placanro1'
+
+		topic = f'{device}/boton'
+		payload = 'fruta'
+		hostname = 'raspi'
+		port = 1883
+		auth={
+			'username': "user",
+			'password': "pass"
+		}
+		publish.single(topic=topic, payload=payload, hostname=hostname, port=port)
+
 		# Se permanece en la misma pagina.
 		return HttpResponseRedirect('/inicio')
 
