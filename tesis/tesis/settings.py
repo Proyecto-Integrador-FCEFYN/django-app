@@ -91,10 +91,18 @@ WSGI_APPLICATION = 'tesis.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',
+#         'NAME': 'admin',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'tesisdb',
+        'NAME': 'djongo',
+        'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo'
     }
 }
 
