@@ -164,7 +164,7 @@ class HomeView(LoginRequiredMixin, View):
 		device = 'placanro1'
 
 		topic = f'{device}/boton'
-		payload = 'fruta'
+		payload = str(request.user.pk)
 		hostname = 'raspi'
 		port = 1883
 		auth={

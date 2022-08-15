@@ -60,6 +60,7 @@ Detecciones de movimiento
 					<thead>
 						<tr>
 							<th>Fecha y hora</th>
+							<th>Dispositivo</th>
 							<th>Miniatura</th>
 							<th>Ampliar</th>
 						</tr>
@@ -68,8 +69,9 @@ Detecciones de movimiento
 						{% for obj in object_list %}
 							<tr>
 								<td>{{ obj.date_time }}</td>
+								<td>{{ obj.device }}</td>
 								<td>
-									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{% static obj.image %}" alt="No se encontro la imagen">
+									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ obj.image }}" alt="No se encontro la imagen">
 								</td>
 								<td>
 									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ obj.image }}"><span class="fa fa-image"></span></button>
@@ -86,7 +88,7 @@ Detecciones de movimiento
 											</button>
 										</div>
 										<div class="modal-body mx-auto">
-											<img class="img-fluid rounded" src="{% static obj.image %}" alt="No se encontro la imagen">
+											<img class="img-fluid rounded" src="{{ obj.image }}" alt="No se encontro la imagen">
 										</div>
 									</div>
 								</div>
