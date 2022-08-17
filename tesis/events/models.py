@@ -24,6 +24,7 @@ class Movement(models.Model):
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	image		= models.ImageField(_('Imagen'))
+	device      = models.TextField(_('Device'))
 
 
 # Se almacenan los eventos de toque de timbre mediante el pulsador que esta en el
@@ -35,6 +36,7 @@ class Button(models.Model):
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	image		= models.ImageField(_('Imagen'))
+	device      = models.TextField(_('Device'))
 
 
 # Eventos de acceso denegado, es decir, cuando se captura un codigo RFID de un llavero
@@ -47,6 +49,7 @@ class DeniedAccess(models.Model):
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	image		= models.ImageField(_('Imagen'))
+	device      = models.TextField(_('Device'))
 
 
 # Eventos de apertura de puerta mediante la pagina, se almacena ademas quien fue el usuario
