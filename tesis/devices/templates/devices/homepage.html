@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}
+Inicio
+{% endblock title %}
+
+{% block content %}
+
+
+
+<!-- Pagina donde se listan los dispositivos registrados. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3">
+
+    <!-- Los grupos de datos se acomodan dentro de este contenedor de tipo responsive. -->
+    <!-- Se resta margen de arriba para lograr que el jumbotron se pegue a la barra de navegacion.-->
+    <div class="container-responsive" style="margin-top: -16px;">
+        <!-- Menu de herramientas. -->
+        <div class="row">
+            <div class="col">
+                <!-- Subtitulo. -->
+
+                <table class="table table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Usuario actual</th>
+                            <th>Categorías soportadas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ user_name }}</td>                           
+                            <td>
+                                {% for cat in user_category.all%}
+                                <li>{{ cat.category_name }}</li>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <!-- <h5 class="h5 text-info mb-3">Categorías de usuario: 
+                    {% for cat in user_category.all%}
+                        {{ cat.category_name }}
+                        {% endfor %}
+                </h5> -->
+                {% if name_search %}
+                <h5 class="h5 text-info mb-3">Se muestran los resultados de la búsqueda "{{ name_search }}":</h5>
+                {% else %}
+                <h5 class="h5 text-info mb-3">Dispositivos soportados por este usuario:</h5>
+                {% endif %}
+
+                <table class="table table-hover table-responsive">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Dirección IP</th>
+                            <th>Puerto</th>
+                            <!-- Se especifica un minimo de ancho para la columna para que el titulo no se separe por palabras en caso de achicarse la tabla, por ejemplo en pantallas de celulares. -->
+                            <th style="min-width:178px;">Dirección MAC</th>
+                            <th>Categorías</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se puede utilizar como variable de contexto por defecto tanto "object_list" como asi tambien "device_list". -->
+                        {% for device in device_list %}
+                        <tr>
+                            <a class="navbar-brand text-info" href="/dispositivos/manage/{{ device.id }}"><td>{{ device.device_name }}</td></a>
+                            <td>{{ device.ip_address }}</td>
+                            <td>{{ device.puerto }}</td>
+                            <td>{{ device.MAC_address }}</td>
+                            <td>{% for cat in device.category_list.all %}
+                                <li>{{ cat.category_name }}</li>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <a class="btn btn-outline-secondary" href="/dispositivos/manage/{{ device.id }}"><span
+                                        class="fa fa-plus"></span> Controlar dispositivo</a>
+                            </td>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% include "snippets/pagination.html" %}
+
+{% endblock content %}

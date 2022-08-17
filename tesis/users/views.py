@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+from django.http import JsonResponse
 # Para sacar (desloguear) un usuario si no pasa el "AdminTest".
 from django.contrib.auth import logout
 # Agregados a las vistas para mayor control, como requerimiento de logueo
@@ -8,6 +8,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 # Para el manejo de mails.
 from django.core.mail import send_mail
+from django import forms
 # Para realizar querysets mas especificos.
 from django.db.models import Q
 # Para crear el "ModelForm" dado un modelo. Se utiliza para agregar widgets
@@ -39,7 +40,8 @@ import random
 # Para la comunicacion con el programa principal.
 import socket
 
-
+import logging
+logger = logging.getLogger(__name__)
 
 
 #----------------------------------------------------------------------------------------
@@ -79,41 +81,52 @@ class UserRegisterStep1View(AdminTest, CreateView):
 	# valida, deberia de retornar un HttpResponse.
 
 	def form_valid(self, form):
-		### aca se deberia preguntar de donde viene y si el usuario que se pretende
-		### crear es un admin, en caso de no serlo, volver a la misma pag.
 		# Se ejecuta la funcion "save()" del formulario "UserCreationForm".
 		form.save()
 		# Se obtiene la clave principal del usuario creado para pasar como
 		# argumento ("**kwargs") a la proxima etapa de registro de usuario. 
 		pk = form.get_pk()
-		# Se obtiene el atributo "is_staff" del usuario creado para en caso
-		# de ser "admin" se salta el segundo paso, esto es debido a que los
-		# admin no tienen franjas horarias.
-		admin = form.get_is_staff()
-		if (admin):
-			# Se redirige a la pagina encargada de obtener el codigo de la tarjeta
-			# RFID del usuario (paso 3).
-			return HttpResponseRedirect(reverse('users:user_register_step_3', kwargs={'pk':pk}))
-		else:
-			# Se redirige a la pagina encargada de editar las franjas horarias (paso 2).
-			return HttpResponseRedirect(reverse('users:user_register_step_2', kwargs={'pk':pk}))
+		return HttpResponseRedirect(reverse('users:user_register_step_2', kwargs={'pk':pk}))
 
+
+class UserRegisterStep2View(AdminTest, UpdateView):
+	model = User
+	template_name = 'users/user_register_step_2.html'
+	# Este metodo es llamado cuando se realiza un POST con informacion
+	# valida, deberia de retornar un HttpResponse.
+	form_class = modelform_factory(User,
+		fields = [
+			'category_list',
+			'is_staff',
+		],
+		widgets={
+			'category_list': forms.CheckboxSelectMultiple
+		})
+	
+	# Se obtiene el atributo "is_staff" del usuario creado para en caso
+	# de ser "admin" se salta el cuarto paso, esto es debido a que los
+	# admin no tienen franjas horarias.
+	def get_success_url(self):
+		if self.object.is_staff:
+			return reverse('users:user_register_step_4', kwargs={'pk':self.kwargs['pk']})
+		else:
+			return reverse('users:user_register_step_3', kwargs={'pk':self.kwargs['pk']})
 
 # En esta vista se crean las franjas horarias y se especifica la fecha
 # limite de la actividad del usuario. Simplemente una vez que se verifica
 # que el formulario sea valido, se modifican los campos del usuario con
 # los cargados en el formulario.
-class UserRegisterStep2View(AdminTest, FormView):
+class UserRegisterStep3View(AdminTest, FormView):
 
 	form_class = UserTimeZoneForm
-	template_name = 'users/user_register_step_2.html'
+	template_name = 'users/user_register_step_3.html'
 
 	# Funcion que genera el contexto para el template, en este caso se
 	# agrega al contexto todos los objectos del modelo "TimeZone"
 	# para poder mostrar informacion acerca de los horarios de las franjas
 	# en la pagina.
 	def get_context_data(self, **kwargs):
-		context = super(UserRegisterStep2View, self).get_context_data(**kwargs)
+		context = super(UserRegisterStep3View, self).get_context_data(**kwargs)
 		context['time_zone'] = TimeZone.objects.all()
 		return context
 
@@ -131,11 +144,11 @@ class UserRegisterStep2View(AdminTest, FormView):
 		user.saturday=form.cleaned_data['saturday']
 		user.sunday=form.cleaned_data['sunday']
 		user.save()
-		return HttpResponseRedirect(reverse('users:user_register_step_3', kwargs={'pk':self.kwargs['pk']}))
+		return HttpResponseRedirect(reverse('users:user_register_step_4', kwargs={'pk':self.kwargs['pk']}))
 
 
 # Vista encargada del manejo del codigo RFID del llavero
-class UserRegisterStep3View(AdminTest, View):
+class UserRegisterStep4View(AdminTest, View):
 
 	# Funcion que brinda la pagina una vez que se accede a la URL.
 	# Dependiendo de que URL se acceda, carga distinto template.
@@ -148,11 +161,11 @@ class UserRegisterStep3View(AdminTest, View):
 		# Si se viene de dar de baja un usuario, recordar que la vista "UserUnsubscribeView"
 		# es de tipo "RedirectView", por lo que su "referer" es la pagina desde la cual
 		# se accede a dicha vista.
-		elif 'registro-paso-3' in referer:
-			return HttpResponseRedirect(reverse('users:user_register_step_4', kwargs={'pk':self.kwargs['pk']}))
+		elif 'registro-paso-4' in referer:
+			return HttpResponseRedirect(reverse('users:user_register_step_5', kwargs={'pk':self.kwargs['pk']}))
 		# En casos contrarios, como ser que se venga del primer o segundo paso.
 		else :
-			return render(request, 'users/user_register_step_3.html')
+			return render(request, 'users/user_register_step_4.html')
 
 	# Funcion encargada de procesar los formularios.
 	def post(self,request,**kwargs):
@@ -188,7 +201,7 @@ class UserRegisterStep3View(AdminTest, View):
 				# Tambien interesa si es que se esta editando el usuario, es por esto la
 				# variable de contexto "edit", que se obtiene del template "user_edit_code.html".
 				context = {'user':user.get_full_name(), 'user_pk':user.id, 'user_code':code, 'edit':edit}
-				return render(request, 'users/user_register_step_3_error.html', context)
+				return render(request, 'users/user_register_step_4_error.html', context)
 			# En caso contrario, se procede a guardar el usuario con el codigo obtenido.
 			else:
 				# Se guarda el usuario con el codigo obtenido.
@@ -199,7 +212,7 @@ class UserRegisterStep3View(AdminTest, View):
 					return HttpResponseRedirect(reverse('users:user_edit_code_success'))
 				# En caso de ser una creacion de usuario, se redirecciona a la pagina de 
 				# finalizacion de la tarea.
-				return HttpResponseRedirect(reverse('users:user_register_step_4', kwargs={'pk':pk}))
+				return HttpResponseRedirect(reverse('users:user_register_step_5', kwargs={'pk':pk}))
 		# Si se presiona el boton "Omitir".
 		elif 'omit' in request.POST:
 			# Se redirecciona a la pagina de finalizacion de la tarea, no se asigna codigo RFID
@@ -209,7 +222,7 @@ class UserRegisterStep3View(AdminTest, View):
 			if request.POST.get('edit') == '1':
 				return HttpResponseRedirect(reverse('users:user_edit_code_success'))
 			else :
-				return HttpResponseRedirect(reverse('users:user_register_step_4', kwargs={'pk':pk}))
+				return HttpResponseRedirect(reverse('users:user_register_step_5', kwargs={'pk':pk}))
 		# Si se presiona el boton "Eliminar codigo actual" en caso de editar el usuario.
 		elif 'delete_code' in request.POST:
 			# Se establece un string vacio como nuevo codigo.
@@ -232,7 +245,8 @@ class UserRegisterStep3View(AdminTest, View):
 		# Si se presiona el boton "Cancelar operacion" en la pagina de error de obtencion del
 		# codigo mediante el lector RFID. Se redirige a la pagina principal ("home").
 		elif 'abort' in request.POST:
-			return HttpResponseRedirect(reverse('events:home'))
+			# return HttpResponseRedirect(reverse('events:home'))
+			return HttpResponseRedirect(reverse('devices:home'))
 
 	# Funcion encargada de obtener el codigo RFID del llavero. Crea un socket de tipo
 	# INET y se conecta al servidor que reside en el programa principal, establece un
@@ -269,13 +283,13 @@ class UserRegisterStep3View(AdminTest, View):
 
 
 # Vista para la finalizacion del registro de un usuario.
-class UserRegisterStep4View(AdminTest, View):
+class UserRegisterStep5View(AdminTest, View):
 
 	# Funcion encargada de mostrar la pagina al acceder a la vista.
 	def get(self,request,**kwargs):
 		# Primero se crea y establece la contraseña del usuario.
 		self.set_user_password(self.kwargs['pk'])
-		return render(request, 'users/user_register_step_4.html')
+		return render(request, 'users/user_register_step_5.html')
 
 	# Funcion encargada de crear, guardar y avisar la contraseña del usuario.
 	def set_user_password(self,pk):
@@ -620,8 +634,51 @@ class TimeZoneCreateView(AdminTest, CreateView):
 		})
 
 #----------------------------------------------------------------------------------------
-	
+#		Categorías
+#----------------------------------------------------------------------------------------
 
+# Vista que muestra las categorías actuales.
+class CategoryListView(AdminTest, ListView):
+	# El template por defecto es "category_list.html", por lo que se utiliza
+	# dicho nombre para el template.
+	# Las variables de contexto por defecto es "object_list" o tambien
+	# "category_list", al igual que el template por defecto.
+	# Se indica el modelo a utilizar.
+	model = Category
+
+
+# Vista que permite editar una franja.
+class CategoryEditView(AdminTest, UpdateView):
+
+	# Modelo a utilizar.
+	model = Category
+	# Template a utilizar, no se usa el por defecto por cuestion de preferencia
+	# de nombre nada mas.
+	fields = ['category_name']
+	template_name = 'users/category_edit.html'
+	success_url = reverse_lazy('users:category_list')
+
+
+# Vista encargada de eliminar una franja, solo pregunta en la pagina
+# si se esta seguro que se desea eliminar el elemento.
+class CategoryDeleteView(AdminTest, DeleteView):
+
+	# El template por defecto es "timezone_confirm_delete.html", por lo que
+	# se crea el template con el mismo nombre.
+	model = Category
+	# Si se elimina el objecto, se vuelve a la lista de franjas horarias.
+	success_url = reverse_lazy('users:category_list')
+
+# Vista encargada de la creacion de una nueva franja, genera un formulario
+# con los campos que se especifican del modelo.
+class CategoryCreateView(AdminTest, CreateView):
+
+	# Modelo a utilizar.
+	model = Category
+	# Template a utilizar.
+	template_name = 'users/category_create.html'
+	fields = ['category_name']
+	success_url = reverse_lazy('users:category_list')
 
 #----------------------------------------------------------------------------------------
 #		Otros (edicion y olvido de usuario)
@@ -674,21 +731,27 @@ class UserEditView(AdminTest, UpdateView):
 	# Template a utilizar
 	template_name = 'users/user_edit.html'
 	# Los campos del modelo que se muestran para la edicion.
-	fields = [
+	form_class = modelform_factory(User,
+		fields = [
 			'first_name',
 			'last_name',
 			'email',
 			'identity',
 			'phone',
+			'category_list',
 			'is_staff',
-	]
+		],
+		widgets={
+			'category_list': forms.CheckboxSelectMultiple
+		})
 
 	# Funcion encargada de definir los campos a mostrar en los formularios
 	# dependiendo del tipo de usuario que sea, ya que si no es admin, se
-	# tienen que poder editar las franjas y la fecha limite tambien.
+	# tienen que poder editar las franjas y la fecha limite también.
 	def dispatch(self, request, **kwargs):
 		if not User.objects.get(pk=self.kwargs['pk']).is_staff:
-			self.fields = [
+			self.form_class = modelform_factory(User,
+				fields = [
 				'first_name',
 				'last_name',
 				'email',
@@ -703,7 +766,28 @@ class UserEditView(AdminTest, UpdateView):
 				'friday',
 				'saturday',
 				'sunday',
-			]
+				'category_list',
+				],
+				widgets={
+					'category_list': forms.CheckboxSelectMultiple
+				})
+			# self.fields = [
+			# 	'first_name',
+			# 	'last_name',
+			# 	'email',
+			# 	'identity',
+			# 	'phone',
+			# 	'is_staff',
+			# 	'expiration_date',
+			# 	'monday',
+			# 	'tuesday',
+			# 	'wednesday',
+			# 	'thursday',
+			# 	'friday',
+			# 	'saturday',
+			# 	'sunday',
+			# 	'category_list',
+			# ]
 		return super(UserEditView, self).dispatch(request, **kwargs)
 		
 

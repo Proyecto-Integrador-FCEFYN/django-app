@@ -61,12 +61,16 @@ urlpatterns=[
     # actual de un usuario previamente creado.
 	url(r'^usuarios/registro-paso-1/$', views.UserRegisterStep1View.as_view(),
 		name='user_register_step_1'),
+	url(r'^usuarios/registro-paso-1/$', views.UserRegisterStep1View.as_view(),
+		name='user_register_step_1'),
 	url(r'^usuarios/registro-paso-2/(?P<pk>[0-9]+)/$', views.UserRegisterStep2View.as_view(),
 		name='user_register_step_2'),
 	url(r'^usuarios/registro-paso-3/(?P<pk>[0-9]+)/$', views.UserRegisterStep3View.as_view(),
 		name='user_register_step_3'),
 	url(r'^usuarios/registro-paso-4/(?P<pk>[0-9]+)/$', views.UserRegisterStep4View.as_view(),
 		name='user_register_step_4'),
+	url(r'^usuarios/registro-paso-5/(?P<pk>[0-9]+)/$', views.UserRegisterStep5View.as_view(),
+		name='user_register_step_5'),
 
 	# URLS para dar de baja y alta un usuario.
 	url(r'^usuarios/dar-baja/(?P<pk>[0-9]+)-(?P<pk_alt>[0-9]+)/$', views.UserUnsubscribeView.as_view(),
@@ -88,6 +92,18 @@ urlpatterns=[
 		name='time_zone_delete'),
 	url(r'^usuarios/franjas-horarias/crear/$', views.TimeZoneCreateView.as_view(),
 		name='time_zone_create'),
+
+	# URLS para el manejo de categorias.
+	url(r'^usuarios/categorias/$', views.CategoryListView.as_view(),
+		name='category_list'),
+	url(r'^usuarios/categorias/editar/(?P<pk>[0-9]+)/$', views.CategoryEditView.as_view(),
+		name='category_edit'),
+	url(r'^usuarios/categorias/eliminar/(?P<pk>[0-9]+)/$', views.CategoryDeleteView.as_view(),
+		name='category_delete'),
+	url(r'^usuarios/categorias/crear/$', views.CategoryCreateView.as_view(),
+		name='category_create'),
+
+
 
 	url(r'^usuarios/lista/$', views.UsersListView.as_view(), name='users_list'),
 	url(r'^usuarios/editar/(?P<pk>[0-9]+)/$', views.UserEditView.as_view(), name='user_edit'),

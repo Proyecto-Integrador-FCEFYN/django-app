@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
 
     # Para el manejo de formularios Django con Bootsrap 4.
     'bootstrap4',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     # Aplicaciones propias creadas, es necesario registrarlas aca.
     'events',
     'users',
+    'devices',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +78,7 @@ TEMPLATES = [
             ],
         },
     },
+    
 ]
 
 WSGI_APPLICATION = 'tesis.wsgi.application'
@@ -91,27 +94,36 @@ WSGI_APPLICATION = 'tesis.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'djongo',
-#         'NAME': 'admin',
-#     }
-# }
-
+# DATABASE_ROUTERS = ['tesis.dbRouter.dbRouter']
 DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'djongo',
-        'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo'
+        # 'backup': {
+        #     'ENGINE': 'djongo',
+        #     'ENFORCE_SCHEMA': False,
+        #     'NAME': 'djongo',
+        #     'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo',
+        #     'my_host': '24.232.132.26',
+        #     'my_port' : '27015',
+        # },
+        'default': {
+            'ENGINE': 'djongo',
+            'ENFORCE_SCHEMA': False,
+            'NAME': 'djongo-integration',
+            'my_host': '127.0.0.1',
+            'my_port' : '27017',
+        }
+    #         'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
     }
-}
 
 
 # Auth
 
 AUTH_USER_MODEL = 'users.User'
 
-LOGIN_REDIRECT_URL = 'events:home'
+# LOGIN_REDIRECT_URL = 'events:home'
+LOGIN_REDIRECT_URL = 'devices:home'
 LOGIN_URL = 'users:login'
 LOGOUT_REDIRECT_URL = 'users:login'
 
@@ -128,7 +140,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'accesolac@gmail.com'
-EMAIL_HOST_PASSWORD = 'raspberry'
+# EMAIL_HOST_PASSWORD = 'raspberry'
+EMAIL_HOST_PASSWORD ='xgrjpgziplbqvokb'
 EMAIL_USE_SSL = True
 
 # Password validation
@@ -174,3 +187,31 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
+from django.contrib.messages import constants as messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: 'alert-info',
+    messages.INFO: 'alert-info',
+    messages.SUCCESS: 'alert-success',
+    messages.WARNING: 'alert-warning',
+    messages.ERROR: 'alert-danger',
+}

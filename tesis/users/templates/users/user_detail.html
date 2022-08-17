@@ -40,6 +40,15 @@ Perfil de usuario
 				<td>{{ user.date_joined }}</td>
 			</tr>
 			<tr>
+				<th>Categoría:</th>
+				<td>
+				{% for cat in user.category_list.all %}
+				<br/>{{ cat }}<br/>
+				{% endfor %}
+				</td>
+			
+			</tr>
+			<tr>
 				<th>Última conexión:</th>
 				<td>
 					{% if user.last_login != None %}
@@ -111,7 +120,7 @@ Perfil de usuario
 	{% endif %}
 	<div class="mb-3">
 		<a class="btn btn-outline-secondary m-1" href="/usuarios/editar/{{ user.id }}">Modificar datos</a>
-		<a class="btn btn-outline-secondary m-1" href="/usuarios/registro-paso-3/{{ user.id }}">Cambiar llavero</a>
+		<a class="btn btn-outline-secondary m-1" href="/usuarios/registro-paso-4/{{ user.id }}">Cambiar llavero</a>
 		<a class="btn btn-outline-secondary m-1" href="/eventos/usuario/{{ user.id }}">Ver eventos</a>
 	</div>
 	<a class="text-info" href="/usuarios/lista">Volver atrás</a>

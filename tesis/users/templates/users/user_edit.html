@@ -62,6 +62,7 @@ Modificar datos del usuario
 	        		{% bootstrap_field form.phone show_label=False show_help=False placeholder=False %}
 	        	</div>
 	        </div>
+
 	        <div class="row">
 	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
 	        		{{ form.is_staff.label_tag }}
@@ -69,6 +70,15 @@ Modificar datos del usuario
 	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
 	        		{% bootstrap_field form.is_staff show_label=False show_help=False placeholder=False %}
 	        	</div>
+	        </div>
+
+			<div class="row">
+	        	<div class="col-12 col-sm-4 col-md-3 col-lg-2">
+	        		{{ form.category_list.label_tag }}
+	        	</div>
+	        	<div class="col-12 col-sm-6 col-md-5 col-lg-4">
+					{% bootstrap_field form.category_list show_label=False show_help=False placeholder=False %}
+				</div>
 	        </div>
 
 	        <!-- Si el usuario no es administrador se muestran las franjas horarias y la fecha limite. -->
