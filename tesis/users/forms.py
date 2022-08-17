@@ -11,6 +11,8 @@ from django.forms import ModelForm
 # Se importan las funciones creadas para esta aplicacion.
 from .utils import *
 
+import logging
+logger = logging.getLogger("mylogger")
 
 # Para utilizar el usuario modificado en vez del auth.User.
 User = get_user_model()
@@ -41,21 +43,25 @@ class ErrorsHandleAuthenticationForm(AuthenticationForm):
 
 # Formulario para el registro de un nuevo usuario.
 class UserCreationForm(forms.ModelForm):
-
     class Meta:
         # El modelo a utilizar.
         model = User
         # Campos del modelo a mostrar en formulario, el campo "is_active"
         # no se muestra debido a que por defecto se lo pone en "True".
         # Los demas campos se crean en las vistas de los pasos posteriores.
+
         fields = (
 			'first_name',
 			'last_name',
 			'email',
 			'identity',
 			'phone',
-			'is_staff',
+			# 'is_staff',
+            # 'category_list',
 		)
+        # widgets={
+		# 	'category_list': forms.CheckboxSelectMultiple
+		# }
 
     # Funcion encargada de registrar el nuevo usuario en la base de datos.
     def save(self, commit=True):

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}
+<!-- El titulo de la pagina cambia si es q se trata de una edicion del codigo o si se esta registrando un nuevo usuario. -->
+{% if not edit %}
+	Agregar nuevo usuario
+{% elif edit == "1" %}
+	Conflicto de código RFID
+{% endif %}
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Para utilizar el servidor de archivos estaticos. -->
+{% load static %}
+
+<!-- Script extra para mostrar el mensaje de alerta. -->
+<script src="{% static 'users/js/getCode.js' %}"></script>
+
+
+<!-- Pagina para registrar nuevo usuario (error en el paso 3) o cuando se desea editar el codigo RFID de un usuario y el codigo ya existe en otro usuario activo. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+	<form class="form-group" method="post">
+	    {% csrf_token %}
+	    {% if not edit %}
+	    	<!-- Subtitulo. -->
+	        <h5 class="h5 text-info mb-3">Paso 4 de 4 - Tarjeta RFID:</h5>
+	        <!-- Barra indicadora del progreso de registro del usuario. -->
+	        <div class="progress mb-5">
+	            <div class="progress-bar" role="progressbar" style="width: 66%;"></div>
+	        </div>
+	    {% endif %}
+        <!-- Mensaje que informa del problema. -->
+       	<div class="alert alert-warning" role="alert">
+       		Este código pertenece al usuario {{ user }} el cual se encuentra activo.
+       	</div>
+       	<!-- Los botones de acciones, se le ponen nombres para diferenciarlos en la vista. -->
+       	<button onclick="getCode()" class="btn btn-outline-secondary mr-3" type="submit" name="get_code">Obtener código</button>
+       	<button class="btn btn-outline-secondary mr-3" type="submit" name="unsubscribe">Dar de baja al usuario en conflicto</button>
+       	{% if not edit %}
+       		<button class="btn btn-outline-secondary" type="submit" name="omit">Omitir</button>
+       	{% elif edit == "1" %}
+       		<button class="btn btn-outline-secondary" type="submit" name="omit">Mantener código</button>
+       	{% endif %}
+       	<!-- Las variables para la vista. -->
+       	<input type="hidden" name="edit" value="{{ edit }}">
+		<input type="hidden" name="user_pk" value="{{ user_pk }}">
+		<input type="hidden" name="user_code" value="{{ user_code }}">
+	</form>
+</div>
+
+{% endblock content %}

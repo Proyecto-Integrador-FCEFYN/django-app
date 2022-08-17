@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dispositivos
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina de confirmacion de eliminacion de un dispositivo. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+
+	<!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <!-- Subtitulo. -->
+        <h5 class="h5 text-info mb-3">Eliminar dispositivo:</h5>
+        <!-- El formulario de Django se acomoda dentro de esta clase. -->
+        <div class="form-group">
+        	<!-- Si el turno a eliminar es valido, o sea que no sea el turno por defecto. -->
+        		<div class="alert alert-warning" role="alert">
+        			¿Está seguro que desea eliminar el dispositivo "{{ object.name }}"?<br>
+        		</div>
+        		<button class="btn btn-outline-secondary" type="submit">Confirmar</button>
+        </div>
+    </form>
+    <!-- Link que permite volver a la pagina anterior. -->
+    <a class="text-info" href="/dispositivos/lista">Volver atrás</a>
+</div>
+
+{% endblock content %}

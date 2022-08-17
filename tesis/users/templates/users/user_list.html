@@ -82,6 +82,7 @@ Usuarios registrados
                             <th style="min-width:178px;">Fecha y hora de alta</th>
                             <th>Activo</th>
                             <th>Admin</th>
+                            <th>Categorías<aside></aside></th>
                             <th>Opciones</th>
                         </tr>
                     </thead>
@@ -106,6 +107,10 @@ Usuarios registrados
                                     {% else %}
                                         <span class="fa fa-close"></span>
                                     {% endif %}
+                                </td>
+                                <td>{% for cat in user.category_list.all %}
+                                    <li>{{ cat }}</li>
+                                    {% endfor %}
                                 </td>
                                 <td>
                                     <!-- Se utiliza "dropleft" en vez de "dropdown" debido a que si hay un solo usuario en la lista, el menu desplegable con "dropdown" aparece cortado (es un bug reportado en Bootstrap). -->

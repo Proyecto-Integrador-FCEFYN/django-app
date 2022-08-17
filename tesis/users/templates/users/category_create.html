@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+Categorías
+{% endblock title %}
+
+{% block content %}
+
+<!-- Para django-bootstrap4. -->
+{% load bootstrap4 %}
+
+
+<!-- Pagina para crear un nuevo turno. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+
+    <!-- Formulario. -->
+    <form class="form-group" method="post">
+        {% csrf_token %}
+        <!-- Subtitulo. -->
+        <h5 class="h5 text-info mb-3">Crear nueva categoría:</h5>
+        <!-- El formulario de Django se acomoda dentro de esta clase. -->
+        <div class="form-group mt-5">
+        	<!-- Se recorren los campos visibles del formulario. -->
+            {% for field in form.visible_fields %}
+	            <div class="row">
+	                <!-- En pantallas pequeñas ocupa toda la fila, en medianas en adelante solo 4 columnas. -->
+	                <div class="col-12 col-sm-4">
+	                    <!-- La etiqueta del campo. -->
+	                    <div class="form-group">
+	                        {{ field.label_tag }}
+	                    </div>
+	                </div>
+	                <!-- En pantallas pequeñas utiliza toda la fila y en medianas en adelante 4 columnas. -->
+	                <div class="col-12 col-sm-4">
+	                    <!-- Si el formulario contiene errores, los recorre y los muestra. -->
+	                    {% if form.non_field_errors %}
+	                        <div class="alert alert-danger" role="alert">
+	                            {% for error in form.non_field_errors %}
+	                                <!-- Se justifica el contenido del texto hacia la izquierda. -->
+	                                <div class="text-left">{{ error }}</div>
+	                            {% endfor %}
+	                        </div>
+	                    {% endif %}
+	                    <!-- Se recorren los campos visibles del formulario y se los muestran sin la etiqueta, sin texto predefinido (placeholder) y sin ayuda. -->
+	                    <div class="form-group">
+	                        {% bootstrap_field field show_label=False show_help=False placeholder=False %}
+	                        <!-- Se da formato al texto de ayuda del campo. -->
+	                        <div style="margin-top: -16px;">
+                        		<small class="text-muted">{{ field.help_text }}</small>
+                        	</div>
+	                    </div>
+	                </div>
+	            </div>
+            {% endfor %}
+            </div>
+        <button class="btn btn-outline-secondary" type="submit">Crear</button>
+    </form>
+    <!-- Link que permite volver a la pagina anterior. -->
+    <a class="text-info" href="/usuarios/categorias">Volver atrás</a>
+</div>
+
+{% endblock content %}

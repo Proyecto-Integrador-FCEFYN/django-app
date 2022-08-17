@@ -89,6 +89,9 @@ class User(AbstractBaseUser):
 	sunday			= models.ForeignKey('users.TimeZone',
 		on_delete=models.SET_DEFAULT, related_name='sunday', verbose_name='Domingo',
 		default=1)
+	
+	category_list = models.ManyToManyField('users.Category', blank=True, related_name='user_category_list', verbose_name='Categoria')
+
 	# Este campo es el codigo de la tarjeta RFID. Se lo va a asignar via socket
 	# con el programa principal.
 	code 			= models.CharField(_('Código'), max_length=10, default='',
@@ -176,6 +179,21 @@ class TimeZone(models.Model):
 	def get_absolute_url(self):
 		return reverse('users:time_zone_list')
 
+	def __str__(self):
+		return self.zone_name
+
+# Modelo para las categorías, contiene unicamente el nombre de la categoría.
+class Category(models.Model):
+
+	# Nombre de la categoría
+	category_name		= models.CharField(_('Nombre'), max_length=20)
+	# En caso de no especificar algun campo del objecto, por defecto
+	# se obtiene el nombre de la franja.
+	def __unicode__(self):
+		return self.category_name
+
+	def __str__(self):
+		return self.category_name
 
 # Modelo para las sesiones de los usuarios. Almacena la clave de un usuario junto
 # a la llave de la sesion, la cual se genera cada vez que un usuario se loguea.

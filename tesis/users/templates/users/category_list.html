@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+Categorías
+{% endblock title %}
+
+{% block content %}
+
+
+<!-- Pagina que muestra las categorías. -->
+<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+
+	<!-- Tabla dentro de la que se coloca la informacion de las categorías. -->
+	<!-- Se marca la fila en la que se encuentra el cursor ("table-hover"). -->
+	<table class="table table-hover table-responsive">
+		<thead>
+			<tr>
+				<!-- Se especifica un minimo de ancho para la columna para que el titulo no se separe por palabras en caso de achicarse la tabla, por ejemplo en pantallas de celulares. -->
+				<th style="min-width:158px;">Nombre</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for cat in category_list %}
+				<tr>
+					<td>{{ cat.category_name }}</td>
+					<td>
+						<!-- Las opciones para cada categorías se colocan dentro de un boton de tipo menu desplegable. -->
+						<div class="dropleft text-center">
+							<button class="btn btn-outline-secondary dropdown-toggle py-0" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopu="true" aria-expanded="false"></button>
+							<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								<a class="dropdown-item" href="/usuarios/categorias/editar/{{ cat.id }}">Editar</a>
+								<a class="dropdown-item" href="/usuarios/categorias/eliminar/{{ cat.id }}">Eliminar</a>
+							</div>
+						</div>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<a class="btn btn-outline-secondary" href="/usuarios/categorias/crear"><span class="fa fa-plus"></span> Crear nueva categoría</a>
+</div>
+
+{% endblock content %}
