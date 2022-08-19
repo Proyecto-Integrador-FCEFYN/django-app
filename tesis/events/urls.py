@@ -12,7 +12,7 @@ urlpatterns = [
 	# URL de inicio, pagina redireccionada luego de loguearse. En esta pagina se puede
 	# ver el stream y abrir la puerta, tanto un usuario que es admin como uno que no.
 	# URLs de las herramientas.
-	url(r'^control/(?P<pk>[0-9]+)/$', views.HomeView.as_view(), name='home'),
+	# url(r'^control/(?P<pk>[0-9]+)/$', views.HomeView.as_view(), name='control'),
 	#
 	# Para realizar el backup.
 	url(r'^herramientas/copia-seguridad/$', views.BackupView.as_view(), name='backup'),

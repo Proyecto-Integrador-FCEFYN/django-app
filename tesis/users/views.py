@@ -245,7 +245,6 @@ class UserRegisterStep4View(AdminTest, View):
 		# Si se presiona el boton "Cancelar operacion" en la pagina de error de obtencion del
 		# codigo mediante el lector RFID. Se redirige a la pagina principal ("home").
 		elif 'abort' in request.POST:
-			# return HttpResponseRedirect(reverse('events:home'))
 			return HttpResponseRedirect(reverse('devices:home'))
 
 	# Funcion encargada de obtener el codigo RFID del llavero. Crea un socket de tipo

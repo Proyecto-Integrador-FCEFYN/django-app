@@ -84,7 +84,7 @@ class RootView(RedirectView):
 			# lo que si pretende ingresar nuevamente, no es necesario que
 			# se loguee y pasa directamente a la pagina de inicio.
 			if self.request.user.is_authenticated:
-				return reverse('events:home')
+				return reverse('devices:home')
 			# Si el usuario todavia no se logueo, debe hacerlo primero para
 			# acceder a la pagina de inicio.
 			else:
