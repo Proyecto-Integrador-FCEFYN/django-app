@@ -58,12 +58,6 @@ class DevicesListView(AdminTest, ListView):
 	# Se cambia el nombre de la pagina en la url.
 	page_kwarg = 'pagina'
 
-	# def get(self, request, *args, **kwargs):
-	# 	qs = Device.objects.all()
-	# 	self.pingDevices(qs)
-	# 	return super().get(request, *args, **kwargs)
-
-
 	# Funcion encargada de atender solicitudes de tipo "POST", en este caso
 	# cuando se presiona el boton "Buscar".
 	def post(self, request):
@@ -90,16 +84,6 @@ class DevicesListView(AdminTest, ListView):
 		}
 		# Se muestra el template.
 		return render(request, 'devices/device_list.html', context)
-
-	# def pingDevices(self, device_list):
-	# 	logger.error("Holitas")
-	# 	for device in device_list:
-	# 		if ping(device.ip_address):
-	# 			device.last_ping = timezone.now()
-	# 			device.save()
-	# 			logger.error("hay")
-	# 		else:
-	# 			logger.error(" no hay")
 
 #----------------------------------------------------------------------------------------
 
@@ -140,7 +124,6 @@ class HomeView(AdminTest, View):
 		for cat in user_cat:
 			categorias.append(cat.id)
 		devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
-		logger.error("devicesss: %s", devices)
 		context = {'device_list' : devices,
 		'user_category': user_cat,
 		'user_name': user_name}
@@ -183,10 +166,17 @@ class PingDeviceView(AdminTest, RedirectView):
 			message = '{}:  No se encuentra el dispositivo.'.format(device.device_name)
 			messages.error(self.request, message)
 	
-class ManageView(AdminTest, View):
-	# Funcion que retorna la pagina a mostrar.
+class ManageView(AdminTest, DetailView):
 	def get(self,request, **kwargs):
-		return render(request, 'devices/device_detail.html')
+		user_cat = self.request.user.category_list.all()
+		device = Device.objects.get(pk=self.kwargs['pk'])
+		# Para asegurarnos que el usuario loggeado tenga las categorías soportadas para controlar este dispositivo.
+		for cat in user_cat:
+			if cat in device.category_list.all():
+				context = {'device' : device.device_name }
+				return render(request, 'devices/device_detail.html', context)
+		return HttpResponseRedirect('/inicio')
+
 
 	def post(self, request, **kwargs):
 
@@ -196,7 +186,7 @@ class ManageView(AdminTest, View):
 		topic = f'{tipo_device}/boton'
 		payload = str(request.user.pk)
 		hostname = device.ip_address # 'raspi'
-		port = device.port # 1883
+		port = device.port
 		auth={
 			'username': "user",
 			'password': "pass"

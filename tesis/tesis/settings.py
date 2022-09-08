@@ -107,7 +107,7 @@ DATABASES = {
         'default': {
             'ENGINE': 'djongo',
             'ENFORCE_SCHEMA': False,
-            'NAME': 'djongo-integration',
+            'NAME': 'backup-djongo',
             'my_host': '127.0.0.1',
             'my_port' : '27017',
         }
@@ -122,7 +122,7 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'users.User'
 
-# LOGIN_REDIRECT_URL = 'events:home'
+# LOGIN_REDIRECT_URL = 'devices:home'
 LOGIN_REDIRECT_URL = 'devices:home'
 LOGIN_URL = 'users:login'
 LOGOUT_REDIRECT_URL = 'users:login'
