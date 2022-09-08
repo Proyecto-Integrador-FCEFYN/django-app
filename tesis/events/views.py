@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+import logging
 # Se importa el archivo de configuracion del proyecto para utilizar la variable
 # que contiene el path absoluto del mismo en caso de realizar el backup.
 from django.conf import settings
@@ -50,13 +50,8 @@ from operator import attrgetter
 import datetime
 # Para manipular paths en caso de realizar backups.
 import os
-# Para la comunicacion con el programa principal.
-import socket
 # Para utilizar como buffer del archivo zip en caso de realizar backups.
-try:
-    from StringIO import StringIO ## for Python 2
-except ImportError:
-    from io import StringIO ## for Python 3
+from io import BytesIO
 
 # Para crear el archivo zip en caso de realizar backups.
 import zipfile
@@ -644,7 +639,7 @@ class BackupView(AdminTest, View):
 	def post(self, request):
 		# Se crea el buffer de tipo string, tambien llamado archivos de memoria para el archivo
 		# zip.
-		string_buffer = StringIO.StringIO()
+		string_buffer = BytesIO()
 		# Se crea el archivo de tipo zip, pasando como primer argumento el buffer de tipo
 		# string como objeto de tipo archivo, y el segundo argumento indicando que se va a
 		# escribir un nuevo archivo.

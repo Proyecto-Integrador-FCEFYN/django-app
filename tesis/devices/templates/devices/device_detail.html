@@ -14,14 +14,16 @@ Manejo de dispositivo
 <!-- Para utilizar el servidor de archivos estaticos. -->
 {% load static %}
 
-
 <!-- Pagina de inicio, donde se puede ver el stream y abrir la puerta. -->
 <!-- Los valores de alto y ancho son los del motion por defecto. -->
 <div align="center">
+	<h1 class="h5 text-info mb-3">Dispositivo: {{ device }}</h1>
 	<div class="container" style="max-width:500px; max-height:375px;">
 		<img class="img-fluid mt-3" src="{% static 'images/pause-stream.jpg'%}" style="max-width:100%; height:auto" id="stream">
 	</div>
 </div>
+
+
 
 <!-- El atributo "action" indica a que url
 enviar el formulario para el tratamiento del mismo,

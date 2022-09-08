@@ -87,12 +87,15 @@ WSGI_APPLICATION = 'tesis.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+
+# En caso de usar un Mongo remoto y querer tener un Mongo local para respaldo, descomentar la siguiente linea "DATABASE_ROUTERS", y agregar
+# "backup" en DATABASES. 
+# 
+# Tener en cuenta lo siguiente:
+# - Al momento de levantar el servicio web mediante python manage.py runserver , la base de datos por "default" TIENE que estar levantada y ser accesible.
+#   Luego de poder conectarse por primera vez, en caso de que se caiga la conexión, se establecerá la conexión con la de backup.
+# - La base establecida por "default" será la primera a la que se querrá acceder. El rounter dbRouter intenterá escribir o leer de esa base, y en caso de falla
+#   se comunicará con la de backup.
 
 # DATABASE_ROUTERS = ['tesis.dbRouter.dbRouter']
 DATABASES = {
@@ -107,7 +110,7 @@ DATABASES = {
         'default': {
             'ENGINE': 'djongo',
             'ENFORCE_SCHEMA': False,
-            'NAME': 'djongo-integration',
+            'NAME': 'backup-djongo',
             'my_host': '127.0.0.1',
             'my_port' : '27017',
         }
@@ -122,7 +125,7 @@ DATABASES = {
 
 AUTH_USER_MODEL = 'users.User'
 
-# LOGIN_REDIRECT_URL = 'events:home'
+# LOGIN_REDIRECT_URL = 'devices:home'
 LOGIN_REDIRECT_URL = 'devices:home'
 LOGIN_URL = 'users:login'
 LOGOUT_REDIRECT_URL = 'users:login'
