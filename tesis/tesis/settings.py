@@ -97,26 +97,23 @@ WSGI_APPLICATION = 'tesis.wsgi.application'
 # - La base establecida por "default" será la primera a la que se querrá acceder. El rounter dbRouter intenterá escribir o leer de esa base, y en caso de falla
 #   se comunicará con la de backup.
 
-# DATABASE_ROUTERS = ['tesis.dbRouter.dbRouter']
+DATABASE_ROUTERS = ['tesis.dbRouter.dbRouter']
 DATABASES = {
-        # 'backup': {
-        #     'ENGINE': 'djongo',
-        #     'ENFORCE_SCHEMA': False,
-        #     'NAME': 'djongo',
-        #     'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo',
-        #     'my_host': '24.232.132.26',
-        #     'my_port' : '27015',
-        # },
+        'backup': {
+            'ENGINE': 'djongo',
+            'ENFORCE_SCHEMA': False,
+            'NAME': 'djongo',
+            'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo',
+        },
         'default': {
             'ENGINE': 'djongo',
             'ENFORCE_SCHEMA': False,
             'NAME': 'backup-djongo',
-            'my_host': '127.0.0.1',
-            'my_port' : '27017',
+            'HOST': 'mongodb://127.0.0.1:27017'
         }
     #         'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite31'),
     # }
     }
 
