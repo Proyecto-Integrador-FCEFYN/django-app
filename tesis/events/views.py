@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import logging
 # Se importa el archivo de configuracion del proyecto para utilizar la variable
 # que contiene el path absoluto del mismo en caso de realizar el backup.
 from django.conf import settings
@@ -22,6 +21,8 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, RedirectView
 # Vista generica para actualizar campos de los modelos.
 from django.views.generic.edit import UpdateView
+from pymongo import MongoClient
+import bson, sys, os, os.path
 import paho.mqtt.publish as publish
 
 # Se importan los modelos de esta aplicacion, que consisten en los eventos.
@@ -55,7 +56,8 @@ from io import BytesIO
 
 # Para crear el archivo zip en caso de realizar backups.
 import zipfile
-
+import logging
+logger = logging.getLogger(__name__)
 
 
 
@@ -677,14 +679,40 @@ class BackupView(AdminTest, View):
 			filename = 'backup del sistema (%s).zip' % today
 		# Si se presiona el boton de "Copia de seguridad de la base de datos".
 		elif 'database_backup' in request.POST:
-			# Nombre del archivo (base de datos del proyecto).
-			# Se obtiene del diccionario del archivo de configuracion.
-			file_name = settings.DATABASES['default']['NAME'].split('/')[-1]
-			# Se obtiene el path absoluto de la base de datos del sistema.
-			file_data = settings.BASE_DIR + '/' + file_name
-			# Se escribe el archivo zip.
-			zip_file.write(file_data, file_name)
-			# Se crea el nombre del archivo a descargar junto con la fecha del dia actual.
+			if settings.DATABASES['default']['ENGINE'] == 'djongo':
+				# Backup de base default
+				mongoUri = settings.DATABASES['default']['HOST']
+				conn = MongoClient(mongoUri)
+				collections = ['users_user', 'users_visitor', 'users_timezone', 'django_session']
+				db_name = settings.DATABASES['default']['NAME']
+				try:
+					self.dump(collections, conn, db_name, 'respaldo_bd-default')
+				except Exception as e:
+					logger.error("Error: %s", str(e))
+
+				# Backup de base backup
+				mongoUri = settings.DATABASES['backup']['HOST']
+				conn = MongoClient(mongoUri)
+				db_name = settings.DATABASES['backup']['NAME']
+				try:
+					self.dump(collections, conn, db_name, 'respaldo_bd-backup')
+				except Exception as e:
+					logger.error("Error: %s", str(e))
+				path = settings.BASE_DIR + '/backups/'
+				for root, dirs, files in os.walk(path):
+					for file in files:
+						zip_file.write(os.path.join(root, file),
+						os.path.relpath(os.path.join(root, file),
+						os.path.join(path, '..')))
+			else:
+				# Nombre del archivo (base de datos del proyecto).
+				# Se obtiene del diccionario del archivo de configuracion.
+				file_name = settings.DATABASES['default']['NAME'].split('/')[-1]
+				# Se obtiene el path absoluto de la base de datos del sistema.
+				file_data = settings.BASE_DIR + '/' + file_name
+				# Se escribe el archivo zip.
+				zip_file.write(file_data, file_name)
+				# Se crea el nombre del archivo a descargar junto con la fecha del dia actual.
 			filename = 'backup de la base de datos (%s).zip' % today
 		# Se cierra el archivo zip.
 		zip_file.close()
@@ -694,3 +722,27 @@ class BackupView(AdminTest, View):
 		response['Content-Disposition'] = 'attachment; filename=%s' % filename
 		# Se retorna la respuesta con el archivo zip a descargar.
 		return response
+	
+	def dump(self, collections, conn, db_name, directory):
+		"""
+		MongoDB Dump
+		:param collections: Database collections name
+		:param conn: MongoDB client connection
+		:param db_name: Database name
+		:param path:
+		:return:
+		
+		>>> DB_BACKUP_DIR = '/path/backups/'
+		>>> conn = MongoClient("mongodb://admin:admin@127.0.0.1:27017", authSource="admin")
+		>>> db_name = 'my_db'
+		>>> collections = ['collection_name', 'collection_name1', 'collection_name2']
+		>>> dump(collections, conn, db_name, DB_BACKUP_DIR)
+		"""
+		db = conn[db_name]
+		path = settings.BASE_DIR + '/backups/'+ directory
+		if not os.path.exists(path):
+			os.makedirs(path)
+		for coll in collections:
+			with open(os.path.join(path , f'{coll}.bson'), 'wb+') as f:
+				for doc in db[coll].find():
+					f.write(bson.BSON.encode(doc))

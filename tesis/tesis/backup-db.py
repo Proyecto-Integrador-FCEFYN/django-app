@@ -66,18 +66,14 @@ if __name__ == '__main__':
         collections = ['users_user', 'users_visitor', 'users_timezone', 'django_session']
         try:
             dump(collections, conn, 'djongo', 'backups')
-            # run_backup(mongoUri, dbname)
             print('[*] Successfully performed backup')
         except Exception as e:
-            print('[-] An unexpected error has occurred')
-            print('[-] '+ str(e) )
-            print('[-] EXIT')
+            print('Error: '+ str(e) )
+            print('EXIT')
         conn1 = MongoClient('mongodb://%s:%s' % (host1, port1))
         try:
             restore('backups', conn1, dbname1)
-            # run_backup(mongoUri, dbname)
             print('[*] Successfully performed backup')
         except Exception as e:
-            print('[-] An unexpected error has occurred')
-            print('[-] '+ str(e) )
-            print('[-] EXIT')
+            print('Error: '+ str(e) )
+            print('EXIT')
