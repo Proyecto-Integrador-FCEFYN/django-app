@@ -62,6 +62,7 @@ class WebOpenDoor(models.Model):
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	user 		= models.ForeignKey('users.User', on_delete=models.CASCADE)
 	image		= models.ImageField(_('Imagen'))
+	device      = models.ForeignKey('devices.Device', on_delete=models.CASCADE)
 
 	# Funcion que devuelve el nombre del modelo.
 	# Se utiliza para poder distinguir entre el modelo "PermittedAccess" cuando

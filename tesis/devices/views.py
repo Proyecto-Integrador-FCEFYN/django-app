@@ -31,6 +31,7 @@ from django.views.generic import CreateView, ListView, UpdateView, DeleteView, R
 from django.views.generic.edit import UpdateView
 import paho.mqtt.publish as publish
 from ping3 import ping
+import requests
 from .models import *
 from users.models import Category, User
 import logging
@@ -177,24 +178,27 @@ class ManageView(AdminTest, DetailView):
 				return render(request, 'devices/device_detail.html', context)
 		return HttpResponseRedirect('/inicio')
 
-
 	def post(self, request, **kwargs):
 
-		device = Device.objects.get(pk=self.kwargs['pk'])
-		tipo_device =  device.type # 'placanro1'
+		BASE_URL = 'http://localhost:5000'
 
-		topic = f'{tipo_device}/boton'
-		payload = str(request.user.pk)
-		hostname = device.ip_address # 'raspi'
+		device = Device.objects.get(pk=self.kwargs['pk'])
+		print(self.kwargs['pk'])
+		tipo_device = device.type  # 'placanro1'
+
+		hostname = device.ip_address  # 'raspi'
 		port = device.port
-		auth={
-			'username': "user",
-			'password': "pass"
+		data = {
+			"host": hostname,
+			"port": port,
+			"user_id": request.user.pk,  # 1,
+			"device_id": int(self.kwargs['pk'])
 		}
-		try:
-			publish.single(topic=topic, payload=payload, hostname=hostname, port=port)
+		# try:
+		r = requests.post(url=f"{BASE_URL}/event/webbutton", json=data)
+		if r.status_code == 200:
 			messages.success(self.request, "Mensaje enviado.")
-		except:
+		else:
 			messages.error(self.request, "No hay comunicación con el dispositivo.")
-		
+
 		return HttpResponseRedirect(self.request.path_info)
