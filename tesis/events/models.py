@@ -36,7 +36,7 @@ class Button(models.Model):
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	image		= models.ImageField(_('Imagen'))
-	device      = models.TextField(_('Device'))
+	device      = models.ForeignKey('devices.Device', on_delete=models.CASCADE)
 
 
 # Eventos de acceso denegado, es decir, cuando se captura un codigo RFID de un llavero
