@@ -49,7 +49,7 @@ class DeniedAccess(models.Model):
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	image		= models.ImageField(_('Imagen'))
-	device      = models.TextField(_('Device'))
+	device      = models.ForeignKey('devices.Device', on_delete=models.CASCADE)
 
 
 # Eventos de apertura de puerta mediante la pagina, se almacena ademas quien fue el usuario
@@ -81,6 +81,7 @@ class PermittedAccess(models.Model):
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	user		= models.ForeignKey('users.User', on_delete=models.CASCADE)
 	image		= models.ImageField(_('Imagen'))
+	device      = models.ForeignKey('devices.Device', on_delete=models.CASCADE)
 
 	# Funcion que devuelve el nombre del modelo.
 	# Se utiliza para poder distinguir entre el modelo "WebOpenDoor" cuando
