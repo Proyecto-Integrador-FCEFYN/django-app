@@ -46,7 +46,7 @@ es la misma vista la que se encarga del procesamiento.-->
 <!-- Script que muestra el stream durante los segundos establecidos una vez que se presiona el boton, y luego vuelve a poner como fuente de la imagen, la que estaba originalmente. -->
 <script>
 	function timeoutStream() {
-		document.getElementById("stream").setAttribute("src", "https://static01.nyt.com/images/2020/10/21/business/21Googleworld-illo/30Googleworld-illo-jumbo.gif?quality=75&auto=webp");
+		document.getElementById("stream").setAttribute("src", "http://{{ device.ip_address }}:{{ device.port }}/video?duracion=14");
 		setTimeout(function() {
 			document.getElementById("stream").setAttribute("src", "{% static 'images/pause-stream.jpg'%}");
 		}, 15000);
