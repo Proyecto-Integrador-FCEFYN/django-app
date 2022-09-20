@@ -6,12 +6,6 @@ Código del llavero
 
 {% block content %}
 
-<!-- Para utilizar el servidor de archivos estaticos. -->
-{% load static %}
-
-<script src="{% static 'users/js/getCode.js' %}"></script>
-
-
 <!-- Pagina de error al obtener el codigo del llavero. -->
 <!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
 <div class="container-responsive ml-2 mr-3" style="max-width:600px;">
@@ -21,7 +15,18 @@ Código del llavero
 	</div>
 	<form class="form-group" method="post">
 		{% csrf_token %}
-		<button class="btn btn-outline-secondary m-2" onclick="getCode()" type="submit" name="get_code">
+		<div class="container-responsive ml-2 mr-3" style="max-width:600px;">
+			<h1 class="h5 text-info mt-2 mb-3">Elija el dispositvo de donde leer el código:</h1>
+			<div class="col-12 col-sm-6">
+			</div>
+			<select class="form-control form-control-sm" name="selected_device">
+				{% for device in device_list %}
+				<option value={{device.id}}> {{device.device_name}} </option>
+				{% endfor %}
+			</select>
+		</div>
+		<br> 
+		<button class="btn btn-outline-secondary m-2" type="submit" name="get_code">
 			Intentar nuevamente
 		</button>
 		<button class="btn btn-outline-secondary m-2" type="submit" name="abort">

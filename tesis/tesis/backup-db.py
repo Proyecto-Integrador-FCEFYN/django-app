@@ -46,34 +46,44 @@ def restore(path, conn, db_name):
                 db[coll.split('.')[0]].insert_many(bson.decode_all(f.read()))
 
 if __name__ == '__main__':
-    if (not(len(sys.argv) == 9)):
-        print('[-] Incorrect number of arguments')
-        print('python run.py [username] [password] [host] [port] [dbname]')
+    if (not(len(sys.argv) == 11)):
+        print('[-] Incorrect number of arguments (%s)', len(sys.argv))
+        print('Los cinco primeros parámetros refieren a la BD de origen' + \
+        ' y los cinco siguientes refieren a la de origen. Ej:' + '\n' +
+        ' python3 backup-db.py [username1] [password1] [host1] [port1] [dbname1]  ' +\
+        '[username2] [password2] [host2] [port2] [dbname2]')
         sys.exit()
     else:
-        username = sys.argv[1]
-        password = sys.argv[2]
-        host = sys.argv[3]
-        port = sys.argv[4]
-        dbname = sys.argv[5]
-        # username1 = sys.argv[6]
-        # password1 = sys.argv[7]
-        host1 = sys.argv[6]
-        port1 = sys.argv[7]
-        dbname1 = sys.argv[8]
-        mongoUri = 'mongodb://%s:%s@%s:%s/?authMechanism=DEFAULT&authSource=%s' % (username, password, host, port, dbname)
-        conn = MongoClient(mongoUri)
+        username_origen = sys.argv[1]
+        password_origen = sys.argv[2]
+        host_origen = sys.argv[3]
+        port_origen = sys.argv[4]
+        dbname_origen = sys.argv[5]
+        username_dest = sys.argv[6]
+        password_dest = sys.argv[7]
+        host_dest = sys.argv[8]
+        port_dest = sys.argv[9]
+        dbname_dest = sys.argv[10]
+        mongoUri_source = 'mongodb://%s:%s@%s:%s/?authMechanism=DEFAULT&authSource=%s' % (
+            username_origen, password_origen, host_origen, port_origen, dbname_origen)
+        mongoUri_dest = 'mongodb://%s:%s@%s:%s/?authMechanism=DEFAULT&authSource=%s' % (
+            username_origen, password_origen, host_origen, port_origen, dbname_origen)
+        conn = MongoClient(mongoUri_source)
         collections = ['users_user', 'users_visitor', 'users_timezone', 'django_session']
         try:
-            dump(collections, conn, 'djongo', 'backups')
+            dump(collections, conn, dbname_origen, 'backups')
+            # run_backup(mongoUri, dbname)
             print('[*] Successfully performed backup')
         except Exception as e:
-            print('Error: '+ str(e) )
-            print('EXIT')
-        conn1 = MongoClient('mongodb://%s:%s' % (host1, port1))
+            print('[-] An unexpected error has occurred')
+            print('[-] '+ str(e) )
+            print('[-] EXIT')
+        conn1 = MongoClient(mongoUri_dest)
         try:
-            restore('backups', conn1, dbname1)
+            restore('backups', conn1, dbname_dest)
+            # run_backup(mongoUri, dbname)
             print('[*] Successfully performed backup')
         except Exception as e:
-            print('Error: '+ str(e) )
-            print('EXIT')
+            print('[-] An unexpected error has occurred')
+            print('[-] '+ str(e) )
+            print('[-] EXIT')

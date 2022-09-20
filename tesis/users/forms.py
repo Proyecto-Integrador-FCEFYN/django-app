@@ -56,12 +56,7 @@ class UserCreationForm(forms.ModelForm):
 			'email',
 			'identity',
 			'phone',
-			# 'is_staff',
-            # 'category_list',
 		)
-        # widgets={
-		# 	'category_list': forms.CheckboxSelectMultiple
-		# }
 
     # Funcion encargada de registrar el nuevo usuario en la base de datos.
     def save(self, commit=True):

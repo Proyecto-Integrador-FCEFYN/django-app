@@ -194,7 +194,6 @@ class ManageView(AdminTest, DetailView):
 			"user_id": request.user.pk,  # 1,
 			"device_id": int(self.kwargs['pk'])
 		}
-		# try:
 		r = requests.post(url=f"{BASE_URL}/event/webbutton", json=data)
 		if r.status_code == 200:
 			messages.success(self.request, "Mensaje enviado.")

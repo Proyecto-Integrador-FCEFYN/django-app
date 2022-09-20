@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+from devices.models import Device
 from django.http import JsonResponse
 # Para sacar (desloguear) un usuario si no pasa el "AdminTest".
 from django.contrib.auth import logout
+from django.contrib import messages
+
 # Agregados a las vistas para mayor control, como requerimiento de logueo
 # y comprobacion de que el usuario sea admin.
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -27,7 +30,6 @@ from django.views.generic import ListView, TemplateView, DetailView, RedirectVie
 from django.views.generic.edit import *
 # Para el manejo de las respuestas a los pedidos.
 from django.http import HttpResponseRedirect, HttpResponse
-
 # Los formularios de la aplicacion actual ("users").
 from .forms import *
 # Los modelos de la aplicacion actual ("users").
@@ -39,8 +41,9 @@ import csv
 import random
 # Para la comunicacion con el programa principal.
 import socket
-
+import requests
 import logging
+import json
 logger = logging.getLogger(__name__)
 
 
@@ -148,16 +151,19 @@ class UserRegisterStep3View(AdminTest, FormView):
 
 
 # Vista encargada del manejo del codigo RFID del llavero
-class UserRegisterStep4View(AdminTest, View):
-
-	# Funcion que brinda la pagina una vez que se accede a la URL.
+class UserRegisterStep4View(AdminTest, FormView):
+	# Función que brinda la página una vez que se accede a la URL.
 	# Dependiendo de que URL se acceda, carga distinto template.
+	form_class = modelform_factory(Device,
+		fields = ['device_name'])
+
 	def get(self,request,**kwargs):
 		# Se obtiene la URL desde la cual se accedio (URL previa).
 		referer = self.request.META.get('HTTP_REFERER')
 		# Si se viene del perfil del usuario.
 		if 'perfil' in referer:
-			return render(request, 'users/user_edit_code.html')
+			context = self.get_context_data(**kwargs)
+			return render(request, 'users/user_edit_code.html', context)
 		# Si se viene de dar de baja un usuario, recordar que la vista "UserUnsubscribeView"
 		# es de tipo "RedirectView", por lo que su "referer" es la pagina desde la cual
 		# se accede a dicha vista.
@@ -165,7 +171,17 @@ class UserRegisterStep4View(AdminTest, View):
 			return HttpResponseRedirect(reverse('users:user_register_step_5', kwargs={'pk':self.kwargs['pk']}))
 		# En casos contrarios, como ser que se venga del primer o segundo paso.
 		else :
-			return render(request, 'users/user_register_step_4.html')
+			context = self.get_context_data(**kwargs)
+			return render(request, 'users/user_register_step_4.html', context)
+
+	def get_context_data(self, **kwargs):
+		user_cat = self.request.user.category_list.all()
+		categorias = []
+		for cat in user_cat:
+			categorias.append(cat.id)
+		devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+		context = {'device_list' : devices}
+		return context
 
 	# Funcion encargada de procesar los formularios.
 	def post(self,request,**kwargs):
@@ -173,8 +189,8 @@ class UserRegisterStep4View(AdminTest, View):
 		pk = self.kwargs['pk']
 		# Si se presiona el boton "Obtener codigo" u "Obtener otro codigo" en caso de conflicto.
 		if 'get_code' in request.POST:
-			# Se obtiene el codigo del llavero RFID.
-			code = self.get_code()
+			#Se obtiene el codigo del llavero RFID.
+			code = self.get_code(request.POST.get('selected_device'))
 			# Se obtiene el usuario activo con el codigo solicitado o None en caso
 			# de no existir.
 			user = self.get_active_user(code)
@@ -184,10 +200,12 @@ class UserRegisterStep4View(AdminTest, View):
 			# Si el codigo obtenido por el metodo "get_code()" es un string vacio, significa
 			# que no se capturo algun codigo RFID con el lector, por lo que se muestra una
 			# pagina donde da la posibilidad de seguir intentando.
-			if code == '':
+			if code == -1:
 				# Se pasa "edit" como contexto para distinguir entre un registro de un
-				# nuevo usuario o una edicion de uno ya existente.
+				# nuevo usuario o una edición de uno ya existente.
 				context = {'edit':edit}
+				device = self.get_context_data(**kwargs)
+				context.update(device)
 				return render(request, 'users/user_get_code_error.html', context)
 			# Si existe el usuario, quiere decir que el llavero RFID ya pertenece a un
 			# usuario activo del sistema, por lo se muestra una pagina en la que se brindan
@@ -201,6 +219,9 @@ class UserRegisterStep4View(AdminTest, View):
 				# Tambien interesa si es que se esta editando el usuario, es por esto la
 				# variable de contexto "edit", que se obtiene del template "user_edit_code.html".
 				context = {'user':user.get_full_name(), 'user_pk':user.id, 'user_code':code, 'edit':edit}
+				device = self.get_context_data(**kwargs)
+				context.update(device)
+				logger.error("context_total: %s", context)
 				return render(request, 'users/user_register_step_4_error.html', context)
 			# En caso contrario, se procede a guardar el usuario con el codigo obtenido.
 			else:
@@ -252,19 +273,20 @@ class UserRegisterStep4View(AdminTest, View):
 	# INET y se conecta al servidor que reside en el programa principal, establece un
 	# tiempo de espera y vencido el tiempo, retorna un string vacio indicando de que
 	# no se obtuvo un codigo leido por el lector RFID.
-	def get_code(self):
-		HOST = '127.0.1.1'
-		PORT = 50001
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((HOST, PORT))
+	def get_code(self, device_pk):
+		logger.error('pk: %s', device_pk)
+		device = Device.objects.get(pk=device_pk)
+		logger.error('device: %s', device)
+		BASE_URL = device.ip_address
+		logger.error('URL: %s', BASE_URL)
 		try:
-			s.settimeout(10)
-			code = s.recv(16)
-			s.close()
-			return code
-		except:
-			s.close()
-			return ''
+			r = requests.get(url=BASE_URL)
+			if r.status_code == 200:
+				return r.text
+			else:
+				return -1
+		except Exception:
+			return -1
 
 	# Funcion encargada de retornar un usuario activo y con el codigo pasado como
 	# parametro, en caso de encontrar lo devuelve y en caso contrario retorna None.
@@ -771,23 +793,6 @@ class UserEditView(AdminTest, UpdateView):
 				widgets={
 					'category_list': forms.CheckboxSelectMultiple
 				})
-			# self.fields = [
-			# 	'first_name',
-			# 	'last_name',
-			# 	'email',
-			# 	'identity',
-			# 	'phone',
-			# 	'is_staff',
-			# 	'expiration_date',
-			# 	'monday',
-			# 	'tuesday',
-			# 	'wednesday',
-			# 	'thursday',
-			# 	'friday',
-			# 	'saturday',
-			# 	'sunday',
-			# 	'category_list',
-			# ]
 		return super(UserEditView, self).dispatch(request, **kwargs)
 		
 

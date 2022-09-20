@@ -138,45 +138,6 @@ class InitializeSystem(TemplateView):
 			context['password'] = password
 		return context
 
-
-# Vista de inicio, en la cual se muestra el stream de la camara y se permite abrir la
-# puerta.
-# Cuando se solicita la pagina (get) se muestra solamente el template y cuando se
-# presiona el boton de "Abrir puerta" se envia la clave (pk) del usuario al programa
-# principal mediante socket.
-class HomeView(LoginRequiredMixin, View):
-
-	# Funcion que retorna la pagina a mostrar.
-	def get(self,request):
-		return render(request, 'events/home.html')
-
-	# En caso de precionarse el boton de "Abrir puerta", se crea un socket INET de tipo 
-	# STREAM y se conecta al servidor socket, el cual esta en el programa principal,
-	# y se envia la clave primaria del usuario que presiono el boton para ser registrado
-	# en la base de datos.
-	def post(self, request):
-
-		# El numero de placa deberia venir en un selector para elegir
-		# por lo tanto deberia haber un registro de placas en la base
-		device = 'placanro1'
-
-		topic = f'{device}/boton'
-		payload = str(request.user.pk)
-		hostname = 'raspi'
-		port = 1883
-		auth={
-			'username': "user",
-			'password': "pass"
-		}
-		publish.single(topic=topic, payload=payload, hostname=hostname, port=port)
-
-		# Se permanece en la misma pagina.
-		return HttpResponseRedirect('/inicio')
-
-#----------------------------------------------------------------------------------------
-
-
-
 #----------------------------------------------------------------------------------------
 #		Herramientas
 #----------------------------------------------------------------------------------------
