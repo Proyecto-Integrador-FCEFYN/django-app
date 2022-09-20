@@ -1,5 +1,7 @@
 import bson, sys, os, os.path
 from pymongo import MongoClient
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 def dump(collections, conn, db_name, path):
     """
@@ -21,6 +23,8 @@ def dump(collections, conn, db_name, path):
     db = conn[db_name]
     if collections == 'all':
         collections = db.collection_names()
+    print('Haciendo backup de las siguientes colecciones:')
+    print(collections)
     for coll in collections:
         with open(os.path.join(path, f'{coll}.bson'), 'wb+') as f:
             for doc in db[coll].find():
