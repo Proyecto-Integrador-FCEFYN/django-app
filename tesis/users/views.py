@@ -221,7 +221,6 @@ class UserRegisterStep4View(AdminTest, FormView):
 				context = {'user':user.get_full_name(), 'user_pk':user.id, 'user_code':code, 'edit':edit}
 				device = self.get_context_data(**kwargs)
 				context.update(device)
-				logger.error("context_total: %s", context)
 				return render(request, 'users/user_register_step_4_error.html', context)
 			# En caso contrario, se procede a guardar el usuario con el codigo obtenido.
 			else:
@@ -269,16 +268,11 @@ class UserRegisterStep4View(AdminTest, FormView):
 			# return HttpResponseRedirect(reverse('devices:home'))
 			return HttpResponseRedirect(reverse('devices:home'))
 
-	# Funcion encargada de obtener el codigo RFID del llavero. Crea un socket de tipo
-	# INET y se conecta al servidor que reside en el programa principal, establece un
-	# tiempo de espera y vencido el tiempo, retorna un string vacio indicando de que
-	# no se obtuvo un codigo leido por el lector RFID.
+	# Funcion encargada de obtener el codigo RFID del llavero mediante un request de tipo GET a la API
+	# del dispositivo.
 	def get_code(self, device_pk):
-		logger.error('pk: %s', device_pk)
 		device = Device.objects.get(pk=device_pk)
-		logger.error('device: %s', device)
 		BASE_URL = device.ip_address
-		logger.error('URL: %s', BASE_URL)
 		try:
 			r = requests.get(url=BASE_URL)
 			if r.status_code == 200:
