@@ -125,6 +125,7 @@ Eventos del usuario
 						<tr>
 							<th>Fecha y hora</th>
 							<th>Tipo de evento</th>
+							<th>Dispositivo</th>
 							<th>Miniatura</th>
 							<th>Ampliar</th>
 						</tr>
@@ -138,8 +139,12 @@ Eventos del usuario
 									{% elif "PermittedAccess" in obj.get_name %}Ingreso con llavero
 									{% else %}No se pudo determinar el tipo de evento
 									{% endif %}
+                                </td>
+                                <td>
+                                    {{ obj.device.device_name }}
+                                </td>
 								<td>
-									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{% static obj.image %}" alt="No se encontro la imagen">
+									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ obj.image }}" alt="No se encontro la imagen">
 								</td>
 								<td>
 									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ obj.image }}"><span class="fa fa-image"></span></button>
@@ -156,7 +161,7 @@ Eventos del usuario
 											</button>
 										</div>
 										<div class="modal-body mx-auto">
-											<img class="img-fluid rounded" src="{% static obj.image %}" alt="No se encontro la imagen">
+											<img class="img-fluid rounded" src="{{ obj.image }}" alt="No se encontro la imagen">
 										</div>
 									</div>
 								</div>
