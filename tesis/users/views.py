@@ -272,11 +272,11 @@ class UserRegisterStep4View(AdminTest, FormView):
 	# del dispositivo.
 	def get_code(self, device_pk):
 		device = Device.objects.get(pk=device_pk)
-		BASE_URL = device.ip_address
+		BASE_URL = f"http://{device.ip_address}:{device.port}/register_rfid"
 		try:
 			r = requests.get(url=BASE_URL)
 			if r.status_code == 200:
-				return r.text
+				return r.content.replace(b'\x02', b'').replace(b'\x03', b'').decode('ascii')
 			else:
 				return -1
 		except Exception:
