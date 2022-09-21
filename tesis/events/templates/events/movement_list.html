@@ -69,7 +69,7 @@ Detecciones de movimiento
 						{% for obj in object_list %}
 							<tr>
 								<td>{{ obj.date_time }}</td>
-								<td>{{ obj.device }}</td>
+								<td>{{ obj.device.device_name }}</td>
 								<td>
 									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ obj.image }}" alt="No se encontro la imagen">
 								</td>
