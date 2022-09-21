@@ -24,7 +24,7 @@ class Movement(models.Model):
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
 	image		= models.ImageField(_('Imagen'))
-	device      = models.TextField(_('Device'))
+	device      = models.ForeignKey('devices.Device', on_delete=models.CASCADE)
 
 
 # Se almacenan los eventos de toque de timbre mediante el pulsador que esta en el

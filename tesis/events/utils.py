@@ -136,26 +136,27 @@ def get_response(events, event_type):
 	# Si el evento consta unicamente de la fecha y hora.
 	if type == 1:
 		# Se crean los titulos de las columnas.
-		writer.writerow(['FECHA Y HORA EN UTC', 'IMAGEN'])
+		writer.writerow(['FECHA Y HORA EN UTC', 'DISPOSITIVO', 'IMAGEN'])
 		# Se recorren los usuarios del queryset.
 		for event in events:
 			# Se escriben las filas del archivo csv con la fecha y hora del evento junto al
 			# nombre de la imagen.
-			writer.writerow([event.date_time, str(event.image).split('/')[-1]])
+			writer.writerow([event.date_time, event.device.device_name, str(event.image)])
 	# Si el evento consta de la fecha, hora y el usuario.
 	elif type == 2:
 		# Se crean los titulos de las columnas.
-		writer.writerow(['FECHA Y HORA EN UTC', 'NOMBRE', 'APELLIDO', 'IMAGEN'])
+		writer.writerow(['FECHA Y HORA EN UTC', 'NOMBRE', 'APELLIDO', 'DISPOSITIVO', 'IMAGEN'])
 		# Se recorren los usuarios del queryset.
 		for event in events:
 			# Se escriben las filas del archivo csv con la fecha y hora del evento
 			# junto al nombre y apellido del usuario y el nombre de la imagen.
 			writer.writerow([event.date_time,
-				event.user.first_name.encode('utf-8'),
-				event.user.last_name.encode('utf-8'),
+				event.user.first_name,
+				event.user.last_name,
+				event.device.device_name,
 				# Se separa el path relativo de la imagen y se obtiene unicamente el
 				# nombre de la misma.
-				str(event.image).split('/')[-1]])
+				str(event.image)])
 	# Si no se logra determinar el contenido del evento.
 	else:
 		pass
