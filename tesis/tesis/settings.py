@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django_settings_export.settings_export',
             ],
         },
     },
@@ -117,6 +118,12 @@ DATABASES = {
     # }
     }
 
+FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'http://localhost:5000/files/')
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:5000')
+SETTINGS_EXPORT = [
+   'FILES_API_BASE_URL',
+   'API_BASE_URL'
+]
 
 # Auth
 

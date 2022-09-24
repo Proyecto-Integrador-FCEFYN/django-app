@@ -144,14 +144,14 @@ Eventos del usuario
                                     {{ obj.device.device_name }}
                                 </td>
 								<td>
-									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ obj.image }}" alt="No se encontro la imagen">
+									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontro la imagen">
 								</td>
 								<td>
-									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ obj.image }}"><span class="fa fa-image"></span></button>
+									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ settings.FILES_API_BASE_URL }}{{ obj.image }}"><span class="fa fa-image"></span></button>
 								</td>
 							</tr>
 							<!-- Modal. -->
-							<div class="modal fade" id="{{ obj.image }}" tabindex="-1" role="dialog" aria-labelledby="imageTitle" aria-hidden="true">
+							<div class="modal fade" id="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" tabindex="-1" role="dialog" aria-labelledby="imageTitle" aria-hidden="true">
 								<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 									<div class="modal-content">
 										<div class="modal-header">
@@ -161,7 +161,7 @@ Eventos del usuario
 											</button>
 										</div>
 										<div class="modal-body mx-auto">
-											<img class="img-fluid rounded" src="{{ obj.image }}" alt="No se encontro la imagen">
+											<img class="img-fluid rounded" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontro la imagen">
 										</div>
 									</div>
 								</div>

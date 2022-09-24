@@ -180,7 +180,7 @@ class ManageView(AdminTest, DetailView):
 
 	def post(self, request, **kwargs):
 
-		BASE_URL = 'http://localhost:5000'
+		BASE_URL = settings.API_BASE_URL  # 'http://localhost:5000'
 
 		device = Device.objects.get(pk=self.kwargs['pk'])
 		print(self.kwargs['pk'])
