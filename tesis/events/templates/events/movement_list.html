@@ -71,7 +71,10 @@ Detecciones de movimiento
 								<td>{{ obj.date_time }}</td>
 								<td>{{ obj.device.device_name }}</td>
 								<td>
-									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontro la imagen">
+                                    <video width="320" height="240" controls preload="none">
+                                         <source src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" type=video/mp4>
+                                         Your browser does not support the video tag.
+                                    </video>
 								</td>
 								<td>
 									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ settings.FILES_API_BASE_URL }}{{ obj.image }}"><span class="fa fa-image"></span></button>
@@ -88,7 +91,10 @@ Detecciones de movimiento
 											</button>
 										</div>
 										<div class="modal-body mx-auto">
-											<img class="img-fluid rounded" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontro la imagen">
+                                            <video width="640" height="480" controls autoplay preload="auto" loop>
+                                                <source src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" type=video/mp4>
+                                                 Your browser does not support the video tag.
+                                            </video>
 										</div>
 									</div>
 								</div>

@@ -23,7 +23,7 @@ class Movement(models.Model):
 		ordering = ['-date_time']
 
 	date_time 	= models.DateTimeField(_('Fecha y hora'))
-	image		= models.ImageField(_('Imagen'))
+	image		= models.FileField(_('Imagen'))
 	device      = models.ForeignKey('devices.Device', on_delete=models.CASCADE)
 
 
