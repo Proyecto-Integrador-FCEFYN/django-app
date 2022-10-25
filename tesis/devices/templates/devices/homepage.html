@@ -6,7 +6,7 @@ Inicio
 
 {% block content %}
 
-
+<!-- <meta http-equiv="refresh" content="5" /> -->
 
 <!-- Pagina donde se listan los dispositivos registrados. -->
 <!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
@@ -40,16 +40,54 @@ Inicio
                 </table>
 
 
-                <!-- <h5 class="h5 text-info mb-3">Categorías de usuario: 
-                    {% for cat in user_category.all%}
-                        {{ cat.category_name }}
-                        {% endfor %}
-                </h5> -->
-                {% if name_search %}
-                <h5 class="h5 text-info mb-3">Se muestran los resultados de la búsqueda "{{ name_search }}":</h5>
-                {% else %}
+                <table class="table table-hover table-responsive" >
+                    <meta http-equiv="refresh" content="200" />
+					<thead>
+						<tr>
+							<th>Fecha y hora</th>
+							<th>Dispositivo</th>
+							<th>Miniatura</th>
+							<th>Ampliar</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for obj in button_events %}
+							<tr>
+								<td>{{ obj.date_time }}</td>
+								<td>{{ obj.device.device_name }}</td>
+								<td>
+									<img class="img-fluid rounded" style="max-width:100px; max-height:75px;" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontro la imagen">
+								</td>
+								<td>
+									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ settings.FILES_API_BASE_URL }}{{ obj.image }}"><span class="fa fa-image"></span></button>
+								</td>
+                                <td>
+                                    <a class="btn btn-outline-secondary" href="/dispositivos/manage/{{ obj.device.id }}"><span
+                                            class="fa fa-plus"></span> Ver dispositivo</a>
+                                </td>
+							</tr>
+							<!-- Modal. -->
+							<div class="modal fade" id="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" tabindex="-1" role="dialog" aria-labelledby="imageTitle" aria-hidden="true">
+								<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title" id="imageTitle">{{ obj.date_time }}</h5>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body mx-auto">
+											<img class="img-fluid rounded" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontro la imagen">
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endfor %}
+					</tbody>
+				</table>
+
+
                 <h5 class="h5 text-info mb-3">Dispositivos soportados por este usuario:</h5>
-                {% endif %}
 
                 <table class="table table-hover table-responsive">
                     <thead>
@@ -86,7 +124,6 @@ Inicio
             </div>
         </div>
     </div>
-
 </div>
 {% include "snippets/pagination.html" %}
 

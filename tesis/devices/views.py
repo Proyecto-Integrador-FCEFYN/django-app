@@ -34,6 +34,9 @@ from ping3 import ping
 import requests
 from .models import *
 from users.models import Category, User
+from events.models import Button
+from events.utils import *
+import datetime
 import logging
 logger = logging.getLogger(__name__)
 
@@ -113,7 +116,7 @@ class DeviceDeleteView(AdminTest, DeleteView):
 	success_url = reverse_lazy('devices:device_list')
 
 # Vista que muestra los dispositivos que pueden ser controlados por usuario actual.
-class HomeView(AdminTest, View):
+class HomeView(View):
 	def get(self, request, **kwargs):
 		context = self.get_context_data(**kwargs)
 		return render(request, 'devices/homepage.html', context)
@@ -125,9 +128,28 @@ class HomeView(AdminTest, View):
 		for cat in user_cat:
 			categorias.append(cat.id)
 		devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+		button_events = []
+		for dev in devices:
+			events = Button.objects.filter(device = dev)
+			if events:
+				current_event = events.order_by('-date_time')[0]
+				current_timezone = datetime.datetime.strptime(
+					((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+				current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+				current_event.date_time = current_timezone
+
+				if button_events:
+					if (button_events[0].date_time < current_timezone):
+						button_events.insert(0,current_event)
+					else:
+						button_events.append(current_event)
+				else:
+					button_events.append(current_event)
+
 		context = {'device_list' : devices,
 		'user_category': user_cat,
-		'user_name': user_name}
+		'user_name': user_name,
+		'button_events': button_events}
 		return context
 
 class PingDevicesView(AdminTest, RedirectView):
@@ -149,7 +171,6 @@ class PingDevicesView(AdminTest, RedirectView):
 				messages.error(self.request, message)
 			
 
-
 class PingDeviceView(AdminTest, RedirectView):
 	def get_redirect_url(self, **kwargs):
 		device = Device.objects.get(pk=self.kwargs['pk'])
@@ -167,7 +188,7 @@ class PingDeviceView(AdminTest, RedirectView):
 			message = '{}:  No se encuentra el dispositivo.'.format(device.device_name)
 			messages.error(self.request, message)
 	
-class ManageView(AdminTest, DetailView):
+class ManageView(DetailView):
 	def get(self,request, **kwargs):
 		user_cat = self.request.user.category_list.all()
 		device = Device.objects.get(pk=self.kwargs['pk'])
@@ -201,3 +222,4 @@ class ManageView(AdminTest, DetailView):
 			messages.error(self.request, "No hay comunicación con el dispositivo.")
 
 		return HttpResponseRedirect(self.request.path_info)
+
