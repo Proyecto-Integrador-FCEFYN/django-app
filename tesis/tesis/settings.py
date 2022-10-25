@@ -118,8 +118,8 @@ DATABASES = {
     # }
     }
 
-FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'http://localhost:5000/files/')
-API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost:5000')
+FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://fake1.local/api/v1/files/')
+API_BASE_URL = os.getenv('API_BASE_URL', 'https://fake1.local/api/v1')
 SETTINGS_EXPORT = [
    'FILES_API_BASE_URL',
    'API_BASE_URL'
