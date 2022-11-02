@@ -1,124 +1,155 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 
-{% block title %}
-Dispositivos registrados
-{% endblock title %}
+    {% block title %}
+    Dispositivos registrados
+    {% endblock title %}
 
-{% block content %}
+    {% block content %}
 
-{% block message %}
-{% include "common/messages.html" %}
-{% endblock message %}
-<!-- Se agrega el boton de cancelar para los formularios de tipo "search" que el CSS de Bootstrap lo resetea. Tambien se modifica para que en caso de que en la lista de dispositivos se presione el boton de opciones cerca del final de la tabla, no se recorte el menu desplegable. -->
-<style>
-    input[type="search"]::-webkit-search-cancel-button {
-        -webkit-appearance: searchfield-cancel-button;
-    }
-</style>
+    {% block message %}
+    {% include "common/messages.html" %}
+    {% endblock message %}
+    <!-- Se agrega el boton de cancelar para los formularios de tipo "search" que el CSS de Bootstrap lo resetea. Tambien se modifica para que en caso de que en la lista de dispositivos se presione el boton de opciones cerca del final de la tabla, no se recorte el menu desplegable. -->
+    <style>
+        input[type="search"]::-webkit-search-cancel-button {
+            -webkit-appearance: searchfield-cancel-button;
+        }
+    </style>
 
 
 
-<!-- Pagina donde se listan los dispositivos registrados. -->
-<!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
-<div class="container-responsive ml-2 mr-3">
+    <!-- Pagina donde se listan los dispositivos registrados. -->
+    <!-- Se acomoda todo el contenido dentro de este contenedor con margenes y un tamaño maximo definido. -->
+    <div class="container-responsive ml-2 mr-3">
 
-    <!-- Los grupos de datos se acomodan dentro de este contenedor de tipo responsive. -->
-    <!-- Se resta margen de arriba para lograr que el jumbotron se pegue a la barra de navegacion.-->
-    <div class="container-responsive" style="margin-top: -16px;">
-        <!-- Menu de herramientas. -->
-        <div class="row">
-            <div class="col p-0">
-                <div class="jumbotron p-2">
-                    <button class="btn btn-outline-secondary m-2" type="button" data-toggle="collapse"
-                        data-target="#searchDevice" aria-expanded="false" aria-controls="searchDevice">
-                        Buscar dispositivo
-                    </button>
-                    <a class="btn btn-outline-secondary" href="/dispositivos/pingdevices"><span class="fa fa-check"></span> Ping dispositivos</a>
+        <!-- Los grupos de datos se acomodan dentro de este contenedor de tipo responsive. -->
+        <!-- Se resta margen de arriba para lograr que el jumbotron se pegue a la barra de navegacion.-->
+        <div class="container-responsive" style="margin-top: -16px;">
+            <!-- Menu de herramientas. -->
+            <div class="row">
+                <div class="col p-0">
+                    <div class="jumbotron p-2">
+                        <button class="btn btn-outline-secondary m-2" type="button" data-toggle="collapse"
+                            data-target="#searchDevice" aria-expanded="false" aria-controls="searchDevice">
+                            Buscar dispositivo
+                        </button>
+                        <a class="btn btn-outline-secondary" href="/dispositivos/pingdevices"><span
+                                class="fa fa-check"></span> Ping dispositivos</a>
 
-                    <!-- Formulario. -->
-                    <form class="form-group collapse" method="post" id="searchDevice">
-                        <hr>
-                        {% csrf_token %}
-                        <div class="jumbotron pb-0 pt-4">
-                            <div class="row">
-                                <div class="col-12 col-md-4 col-lg-3">
-                                    <h5 class="h5 text-secondary">Ingresar nombre del dispositivo:</h5>
-                                </div>
-                                <div class="col-6 col-md-4 col-lg-3">
-                                    <input class="form-control" aria-label="Search" type="search"
-                                        value="{{ name_search }}" name="search_device">
-                                </div>
-                                <div class="col-6 col-md-2 col-lg-2">
-                                    <button class="btn btn-outline-secondary" type="submit" name="search"><span
-                                            class="fa fa-search"></span> Buscar</button>
+                        <!-- Formulario. -->
+                        <form class="form-group collapse" method="post" id="searchDevice">
+                            <hr>
+                            {% csrf_token %}
+                            <div class="jumbotron pb-0 pt-4">
+                                <div class="row">
+                                    <div class="col-12 col-md-4 col-lg-3">
+                                        <h5 class="h5 text-secondary">Ingresar nombre del dispositivo:</h5>
+                                    </div>
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <input class="form-control" aria-label="Search" type="search"
+                                            value="{{ name_search }}" name="search_device">
+                                    </div>
+                                    <div class="col-6 col-md-2 col-lg-2">
+                                        <button class="btn btn-outline-secondary" type="submit" name="search"><span
+                                                class="fa fa-search"></span> Buscar</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <!-- Subtitulo. -->
+                    {% if name_search %}
+                    <h5 class="h5 text-info mb-3">Se muestran los resultados de la búsqueda "{{ name_search }}":</h5>
+                    {% else %}
+                    <h5 class="h5 text-info mb-3">Se muestran todos los dispositivos:</h5>
+                    {% endif %}
+                    <table class="table table-hover table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Dirección IP</th>
+                                <th>Puerto</th>
+                                <!-- Se especifica un minimo de ancho para la columna para que el titulo no se separe por palabras en caso de achicarse la tabla, por ejemplo en pantallas de celulares. -->
+                                <th style="min-width:178px;">Dirección MAC</th>
+                                <th>Tipo</th>
+                                <th>Certificado</th>
+                                <th>Ultima vez activo</th>
+                                <th>Categorías</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Se puede utilizar como variable de contexto por defecto tanto "object_list" como asi tambien "device_list". -->
+                            {% for device in device_list %}
+                            <tr>
+                                <td>{{ device.device_name }}</td>
+                                <td>{{ device.ip_address }}</td>
+                                <td>{{ device.port }}</td>
+                                <td>{{ device.MAC_address }}</td>
+                                <td>{{ device.type }}</td>
+                                <!-- Button trigger modal -->
+                                <td>
+                                    <button type="button" class="btn btn-outline-secondary" data-toggle="modal"
+                                        data-target="#ModalCertificado">
+                                        Ver Certificado
+                                    </button>
+                                </td>
+                                <!-- Modal -->
+                                <div class="modal fade" id="ModalCertificado" tabindex="-1" role="dialog"
+                                    aria-labelledby="ModalCertificadoTitle" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Certificado HTTPS</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {{ device.cert }}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Volver</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <td>{{ device.last_ping }}</td>
+                                <td>{% for cat in device.category_list.all %}
+                                    <li>{{ cat.category_name }}</li>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <!-- Se utiliza "dropleft" en vez de "dropdown" debido a que si hay un solo usuario en la lista, el menu desplegable con "dropdown" aparece cortado (es un bug reportado en Bootstrap). -->
+                                    <div class="dropleft text-center">
+                                        <button class="btn btn-outline-secondary dropdown-toggle py-0" type="button"
+                                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopu="true"
+                                            aria-expande="false"></button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="/dispositivos/editar/{{ device.id }}">Editar</a>
+                                            <a class="dropdown-item" href="/dispositivos/ping/{{ device.id }}">Testear
+                                                conectividad</a>
+                                            <a class="dropdown-item"
+                                                href="/dispositivos/eliminar/{{ device.id }}">Eliminar</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <!-- Subtitulo. -->
-                {% if name_search %}
-                <h5 class="h5 text-info mb-3">Se muestran los resultados de la búsqueda "{{ name_search }}":</h5>
-                {% else %}
-                <h5 class="h5 text-info mb-3">Se muestran todos los dispositivos:</h5>
-                {% endif %}
-                <table class="table table-hover table-responsive">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Dirección IP</th>
-                            <th>Puerto</th>
-                            <!-- Se especifica un minimo de ancho para la columna para que el titulo no se separe por palabras en caso de achicarse la tabla, por ejemplo en pantallas de celulares. -->
-                            <th style="min-width:178px;">Dirección MAC</th>
-                            <th>Tipo</th>
-                            <th>Ultima vez activo</th>
-                            <th>Categorías</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Se puede utilizar como variable de contexto por defecto tanto "object_list" como asi tambien "device_list". -->
-                        {% for device in device_list %}
-                        <tr>
-                            <td>{{ device.device_name }}</td>
-                            <td>{{ device.ip_address }}</td>
-                            <td>{{ device.port }}</td>
-                            <td>{{ device.MAC_address }}</td>
-                            <td>{{ device.type }}</td>
-                            <td>{{ device.last_ping }}</td>
-                            <td>{% for cat in device.category_list.all %}
-                                <li>{{ cat.category_name }}</li>
-                                {% endfor %}
-                            </td>
-                            <td>
-                                <!-- Se utiliza "dropleft" en vez de "dropdown" debido a que si hay un solo usuario en la lista, el menu desplegable con "dropdown" aparece cortado (es un bug reportado en Bootstrap). -->
-                                <div class="dropleft text-center">
-                                    <button class="btn btn-outline-secondary dropdown-toggle py-0" type="button"
-                                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopu="true"
-                                        aria-expande="false"></button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <a class="dropdown-item" href="/dispositivos/editar/{{ device.id }}">Editar</a>
-                                        <a class="dropdown-item" href="/dispositivos/ping/{{ device.id }}">Testear conectividad</a>
-                                        <a class="dropdown-item"
-                                            href="/dispositivos/eliminar/{{ device.id }}">Eliminar</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <a class="btn btn-outline-secondary" href="/dispositivos/crear"><span class="fa fa-plus"></span> Agregar
+            dispositivo</a>
+
     </div>
-    <a class="btn btn-outline-secondary" href="/dispositivos/crear"><span class="fa fa-plus"></span> Agregar
-        dispositivo</a>
-
-</div>
-{% include "snippets/pagination.html" %}
+    {% include "snippets/pagination.html" %}
 
 
-{% endblock content %}
+    {% endblock content %}

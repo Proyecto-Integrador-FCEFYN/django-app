@@ -33,7 +33,6 @@ import paho.mqtt.publish as publish
 from ping3 import ping
 import requests
 from .models import *
-from users.models import Category, User
 from events.models import Button
 from events.utils import *
 import datetime
@@ -95,7 +94,7 @@ class DeviceCreateView(AdminTest, CreateView):
 	model = Device
 	template_name = 'devices/device_create.html'
 	form_class = modelform_factory(Device,
-		fields = ['device_name', 'ip_address','port', 'MAC_address','type', 'category_list'],
+		fields = ['device_name', 'ip_address','port', 'MAC_address','type', 'category_list', 'cert'],
 		widgets={
 			'category_list': forms.CheckboxSelectMultiple
 		})
@@ -105,7 +104,7 @@ class DeviceEditView(AdminTest, UpdateView):
 	model = Device
 	template_name = 'devices/device_edit.html'
 	form_class = modelform_factory(Device,
-		fields = ['device_name', 'ip_address','port' ,'MAC_address','type', 'category_list'],
+		fields = ['device_name', 'ip_address','port' ,'MAC_address','type', 'category_list', 'cert'],
 		widgets={
 			'category_list': forms.CheckboxSelectMultiple
 		})
@@ -222,4 +221,3 @@ class ManageView(DetailView):
 			messages.error(self.request, "No hay comunicación con el dispositivo.")
 
 		return HttpResponseRedirect(self.request.path_info)
-

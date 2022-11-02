@@ -31,9 +31,9 @@ class Device(models.Model):
 			'unique': _("Ya existe un dispositivo con esa dirección MAC."),
 		})
 	type = models.CharField(_('Tipo de dispositivo'), max_length=10)
-	# category_list = models.CharField(_('Categorías del dispositivo.'))
 	category_list = models.ManyToManyField('users.Category', blank=True, related_name="device_category_list", verbose_name='Categoria')
 	last_ping = models.DateTimeField(_('Fecha y hora de último ping'))
+	cert = models.CharField(_('Certificado'), max_length=4096)
 
 	def get_name(self):
 		return 'Device'

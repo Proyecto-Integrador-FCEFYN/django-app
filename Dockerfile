@@ -11,6 +11,7 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 RUN sed -i '151s/.$//' /usr/local/lib/python3.8/site-packages/django/contrib/admin/widgets.py
+RUN sed -i "261s/'%s__iexact' % UserModel.get_email_field_name()/'email'/" /usr/local/lib/python3.8/site-packages/django/contrib/auth/forms.py
 
 COPY ./tesis /app
 

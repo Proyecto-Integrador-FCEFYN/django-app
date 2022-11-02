@@ -24,7 +24,8 @@ from django.views.generic.edit import UpdateView
 from pymongo import MongoClient
 import bson, sys, os, os.path
 import paho.mqtt.publish as publish
-
+# Para realizar querysets mas especificos.
+from django.db.models import Q
 # Se importan los modelos de esta aplicacion, que consisten en los eventos.
 from .models import *
 # Se importan las funciones creadas para esta aplicacion.
@@ -40,7 +41,7 @@ from users.models import TimeZone, User
 # Se importa la vista de la aplicacion "users" para la verificacion
 # de que el usuario sea admin, osea "is_staff=True".
 from users.views import AdminTest
-
+from devices.models import Device
 # Se importan estas dos herramientas para obtener una unica lista en caso
 # de utilizar dos querysets.
 from itertools import chain
@@ -296,7 +297,7 @@ class UserEventView(AdminTest, View):
 # Vista que muestra los eventos de movimiento en cercanias de la puerta en horarios
 # extraescolares, es decir que cuando se detecta movimiento entre las 24 y 08 hs
 # se captura una foto del exterior del laboratorio.
-class MovementEventView(AdminTest, ListView):
+class MovementEventView(ListView):
 
 	# El template por defecto es "movement_list.html".
 	# El modelo a utilizar
@@ -307,6 +308,34 @@ class MovementEventView(AdminTest, ListView):
 	paginate_by = 20
 	# Se cambia el nombre en la url de la pagina.
 	page_kwarg = 'pagina'
+
+	# Función que retorna el template a mostrar cuando se visite por primera vez la
+	# página. Cuando se trate de un usuario administrador, se pueden ver todos los eventos. Cuando
+	# es un usuario no-admin, sólo podrá ver los eventos asociados a los dispositivos soportados.
+	def get(self, request, **kwargs):
+		button_events = []
+		if self.request.user.is_staff:
+			button_events = Movement.objects.all()
+		else:
+			user_cat = self.request.user.category_list.all()
+			categorias = []
+			for cat in user_cat:
+				categorias.append(cat.id)
+			devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+			for dev in devices:
+				events = Movement.objects.filter(device = dev)
+				if events:
+					events = events.order_by('-date_time')
+					for current_event in events:
+						current_timezone = datetime.datetime.strptime(
+							((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+						current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+						current_event.date_time = current_timezone
+						button_events.append(current_event)
+
+		context={'object_list': button_events}
+		logger.error("context: %s", context)
+		return render(request, 'events/button_list.html', context)
 
 	# Funcion encargada de manejar el pedido cuando se presiona el boton del filtro.
 	def post(self, request):
@@ -354,7 +383,7 @@ class MovementEventView(AdminTest, ListView):
 # Vista que muestra los eventos de toque de timbre, es decir que cada vez que una
 # persona presione el boton del exterior del laboratorio, se genera un evento
 # conteniendo la fecha, hora y la foto del exterior del laboratorio.
-class ButtonEventView(AdminTest, ListView):
+class ButtonEventView(ListView):
 
 	# El template por defecto es "button_list.html".
 	# El modelo a utilizar
@@ -365,6 +394,34 @@ class ButtonEventView(AdminTest, ListView):
 	paginate_by = 20
 	# Se cambia el nombre en la url de la pagina.
 	page_kwarg = 'pagina'
+
+	# Función que retorna el template a mostrar cuando se visite por primera vez la
+	# página. Cuando se trate de un usuario administrador, se pueden ver todos los eventos. Cuando
+	# es un usuario no-admin, sólo podrá ver los eventos asociados a los dispositivos soportados.
+	def get(self, request, **kwargs):
+		button_events = []
+		if self.request.user.is_staff:
+			button_events = Button.objects.all()
+		else:
+			user_cat = self.request.user.category_list.all()
+			categorias = []
+			for cat in user_cat:
+				categorias.append(cat.id)
+			devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+			for dev in devices:
+				events = Button.objects.filter(device = dev)
+				if events:
+					events = events.order_by('-date_time')
+					for current_event in events:
+						current_timezone = datetime.datetime.strptime(
+							((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+						current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+						current_event.date_time = current_timezone
+						button_events.append(current_event)
+
+		context={'object_list': button_events}
+		logger.error("context: %s", context)
+		return render(request, 'events/button_list.html', context)
 
 	# Funcion encargada de manejar el pedido cuando se presiona el boton del filtro.
 	def post(self, request):
@@ -412,7 +469,7 @@ class ButtonEventView(AdminTest, ListView):
 # Vista que muestra los eventos de accesos denegados, es decir cuando una persona
 # no autorizada (ya sea que no fue registrado en el sistema o que esta inactiva)
 # acerca el llavero al lector para intentar ingresar al laboratorio.
-class DeniedAccessEventView(AdminTest, ListView):
+class DeniedAccessEventView(ListView):
 
 	# El template por defecto es "deniedaccess_list.html".
 	# El modelo a utilizar
@@ -423,6 +480,34 @@ class DeniedAccessEventView(AdminTest, ListView):
 	paginate_by = 20
 	# Se cambia el nombre en la url de la pagina.
 	page_kwarg = 'pagina'
+
+	# Función que retorna el template a mostrar cuando se visite por primera vez la
+	# página. Cuando se trate de un usuario administrador, se pueden ver todos los eventos. Cuando
+	# es un usuario no-admin, sólo podrá ver los eventos asociados a los dispositivos soportados.
+	def get(self, request, **kwargs):
+		button_events = []
+		if self.request.user.is_staff:
+			button_events = DeniedAccess.objects.all()
+		else:
+			user_cat = self.request.user.category_list.all()
+			categorias = []
+			for cat in user_cat:
+				categorias.append(cat.id)
+			devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+			for dev in devices:
+				events = DeniedAccess.objects.filter(device = dev)
+				if events:
+					events = events.order_by('-date_time')
+					for current_event in events:
+						current_timezone = datetime.datetime.strptime(
+							((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+						current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+						current_event.date_time = current_timezone
+						button_events.append(current_event)
+
+		context={'object_list': button_events}
+		logger.error("context: %s", context)
+		return render(request, 'events/deniedaccess_list.html', context)
 
 	# Funcion encargada de manejar el pedido cuando se presiona el boton del filtro.
 	def post(self, request):
@@ -470,7 +555,7 @@ class DeniedAccessEventView(AdminTest, ListView):
 # Vista que muestra los eventos de apertura de puerta via web, esto es cuando un
 # usuario logueado presiona el boton en la pagina para abrir la puerta del
 # laboratorio.
-class WebOpenDoorEventView(AdminTest, ListView):
+class WebOpenDoorEventView(ListView):
 
 	# El template por defecto es "webopendoor_list.html".
 	# El modelo a utilizar
@@ -481,6 +566,34 @@ class WebOpenDoorEventView(AdminTest, ListView):
 	paginate_by = 20
 	# Se cambia el nombre en la url de la pagina.
 	page_kwarg = 'pagina'
+
+	# Función que retorna el template a mostrar cuando se visite por primera vez la
+	# página. Cuando se trate de un usuario administrador, se pueden ver todos los eventos. Cuando
+	# es un usuario no-admin, sólo podrá ver los eventos asociados a los dispositivos soportados.
+	def get(self, request, **kwargs):
+		button_events = []
+		if self.request.user.is_staff:
+			button_events = WebOpenDoor.objects.all()
+		else:
+			user_cat = self.request.user.category_list.all()
+			categorias = []
+			for cat in user_cat:
+				categorias.append(cat.id)
+			devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+			for dev in devices:
+				events = WebOpenDoor.objects.filter(device = dev)
+				if events:
+					events = events.order_by('-date_time')
+					for current_event in events:
+						current_timezone = datetime.datetime.strptime(
+							((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+						current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+						current_event.date_time = current_timezone
+						button_events.append(current_event)
+
+		context={'object_list': button_events}
+		logger.error("context: %s", context)
+		return render(request, 'events/webopendoor_list.html', context)
 
 	# Funcion encargada de manejar el pedido cuando se presiona el boton del filtro.
 	def post(self, request):
@@ -527,7 +640,7 @@ class WebOpenDoorEventView(AdminTest, ListView):
 
 # Vista que muestra los eventos de accesos permitidos, esto es cuando un usuario
 # activo acerca su llavero al lector para ingresar al laboratorio.
-class PermittedAccessEventView(AdminTest, ListView):
+class PermittedAccessEventView(ListView):
 
 	# El template por defecto es "permittedaccess_list.html".
 	# El modelo a utilizar
@@ -538,6 +651,34 @@ class PermittedAccessEventView(AdminTest, ListView):
 	paginate_by = 20
 	# Se cambia el nombre en la url de la pagina.
 	page_kwarg = 'pagina'
+
+	# Función que retorna el template a mostrar cuando se visite por primera vez la
+	# página. Cuando se trate de un usuario administrador, se pueden ver todos los eventos. Cuando
+	# es un usuario no-admin, sólo podrá ver los eventos asociados a los dispositivos soportados.
+	def get(self, request, **kwargs):
+		button_events = []
+		if self.request.user.is_staff:
+			button_events = PermittedAccess.objects.all()
+		else:
+			user_cat = self.request.user.category_list.all()
+			categorias = []
+			for cat in user_cat:
+				categorias.append(cat.id)
+			devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+			for dev in devices:
+				events = PermittedAccess.objects.filter(device = dev)
+				if events:
+					events = events.order_by('-date_time')
+					for current_event in events:
+						current_timezone = datetime.datetime.strptime(
+							((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+						current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+						current_event.date_time = current_timezone
+						button_events.append(current_event)
+
+		context={'object_list': button_events}
+		logger.error("context: %s", context)
+		return render(request, 'events/permittedaccess_list.html', context)
 
 	# Funcion encargada de manejar el pedido cuando se usa el filtro de fechas o
 	# se exportan los eventos.
@@ -583,8 +724,6 @@ class PermittedAccessEventView(AdminTest, ListView):
 			return get_response(context['object_list'], 'PermittedAccess')
 
 #----------------------------------------------------------------------------------------
-
-
 
 #----------------------------------------------------------------------------------------
 #		Backup
