@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('MAC_address', models.CharField(error_messages={'unique': 'Ya existe un dispositivo con esa dirección MAC.'}, max_length=50, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$', 32), 'Ingrese un documento válido (números únicamente).')], verbose_name='Dirección MAC')),
                 ('type', models.CharField(max_length=10, verbose_name='Tipo de dispositivo')),
                 ('category_list', models.ManyToManyField('users.Category', blank=True, verbose_name='Categorías')),
-                ('cert', models.CharField(verbose_name='Certificado', max_length=4096))
+                ('cert', models.TextField(verbose_name='Certificado', max_length=4096))
             ],
         ),
     ]

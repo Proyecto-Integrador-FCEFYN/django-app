@@ -148,7 +148,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'accesolac@gmail.com'
 # EMAIL_HOST_PASSWORD = 'raspberry'
-EMAIL_HOST_PASSWORD ='xgrjpgziplbqvokb'
+EMAIL_HOST_PASSWORD ='qqpshylxrwvyuvju'
 EMAIL_USE_SSL = True
 
 # Password validation
