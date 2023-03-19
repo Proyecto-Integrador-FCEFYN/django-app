@@ -335,7 +335,7 @@ class MovementEventView(ListView):
 
 		context={'object_list': button_events}
 		logger.error("context: %s", context)
-		return render(request, 'events/button_list.html', context)
+		return render(request, 'events/movement_list.html', context)
 
 	# Funcion encargada de manejar el pedido cuando se presiona el boton del filtro.
 	def post(self, request):
