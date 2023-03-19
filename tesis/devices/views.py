@@ -94,9 +94,10 @@ class DeviceCreateView(AdminTest, CreateView):
 	model = Device
 	template_name = 'devices/device_create.html'
 	form_class = modelform_factory(Device,
-		fields = ['device_name', 'ip_address','port', 'MAC_address','type', 'category_list', 'cert'],
+		fields = ['device_name', 'ip_address','port', 'MAC_address','type', 'category_list', 'cert', 'usuario', 'password'],
 		widgets={
-			'category_list': forms.CheckboxSelectMultiple
+			'category_list': forms.CheckboxSelectMultiple,
+			'password': forms.PasswordInput()
 		})
 
 	
@@ -104,9 +105,10 @@ class DeviceEditView(AdminTest, UpdateView):
 	model = Device
 	template_name = 'devices/device_edit.html'
 	form_class = modelform_factory(Device,
-		fields = ['device_name', 'ip_address','port' ,'MAC_address','type', 'category_list', 'cert'],
+		fields = ['device_name', 'ip_address','port' ,'MAC_address','type', 'category_list', 'cert', 'usuario', 'password'],
 		widgets={
-			'category_list': forms.CheckboxSelectMultiple
+			'category_list': forms.CheckboxSelectMultiple,
+			'password': forms.PasswordInput()
 		})
 
 
@@ -205,6 +207,9 @@ class ManageView(DetailView):
 	def post(self, request, **kwargs):
 
 		BASE_URL = settings.API_BASE_URL  # 'http://localhost:5000'
+		API_USUARIO = settings.API_USUARIO
+		API_PASSWORD = settings.API_PASSWORD
+		API_CERT_PATH = settings.API_CERT_PATH
 
 		device = Device.objects.get(pk=self.kwargs['pk'])
 		print(self.kwargs['pk'])
@@ -216,9 +221,12 @@ class ManageView(DetailView):
 			"host": hostname,
 			"port": port,
 			"user_id": request.user.pk,  # 1,
-			"device_id": int(self.kwargs['pk'])
+			"device_id": int(self.kwargs['pk']),
+			"usuario": device.usuario,
+			"password": device.password
 		}
-		r = requests.post(url=f"{BASE_URL}/event/webbutton", json=data)
+		r = requests.post(url=f"{BASE_URL}/event/webbutton", json=data, auth=(API_USUARIO, API_PASSWORD), 
+		    verify=API_CERT_PATH)
 		if r.status_code == 200:
 			messages.success(self.request, "Mensaje enviado.")
 		else:

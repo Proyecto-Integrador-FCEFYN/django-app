@@ -5,7 +5,7 @@ from django.http import JsonResponse
 # Para sacar (desloguear) un usuario si no pasa el "AdminTest".
 from django.contrib.auth import logout
 from django.contrib import messages
-
+from django.conf import settings
 # Agregados a las vistas para mayor control, como requerimiento de logueo
 # y comprobacion de que el usuario sea admin.
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -271,12 +271,25 @@ class UserRegisterStep4View(AdminTest, FormView):
 	# Funcion encargada de obtener el codigo RFID del llavero mediante un request de tipo GET a la API
 	# del dispositivo.
 	def get_code(self, device_pk):
+
+		BASE_URL = settings.API_BASE_URL  # 'http://localhost:5000'
+		API_USUARIO = settings.API_USUARIO
+		API_PASSWORD = settings.API_PASSWORD
+		API_CERT_PATH = settings.API_CERT_PATH
+		
 		device = Device.objects.get(pk=device_pk)
-		BASE_URL = f"http://{device.ip_address}:{device.port}/register_rfid"
+
+		data = {
+			"host": device.ip_address,
+    		"port": device.port,
+    		"usuario": device.usuario,
+    		"password": device.password
+		}	
 		try:
-			r = requests.get(url=BASE_URL)
+			r = requests.post(url=f"{BASE_URL}/rfid", json=data, auth=(API_USUARIO, API_PASSWORD), 
+		    	verify=API_CERT_PATH)
 			if r.status_code == 200:
-				return r.content.replace(b'\x02', b'').replace(b'\x03', b'').decode('ascii')
+				return r.json()['rfid']
 			else:
 				return -1
 		except Exception:

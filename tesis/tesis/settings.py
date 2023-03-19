@@ -25,7 +25,11 @@ SECRET_KEY = ')yp24--99+$n%9&4+@4q=rzkpwcc9*db9$!5hsc-1kv0g+*c27'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['200.16.19.25', 'lac.efn.uncor.edu','127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['192.168.1.110', 
+                 '200.16.19.25', 
+                 'lac.efn.uncor.edu',
+                 '127.0.0.1', 
+                 'localhost']
 
 
 # Application definition
@@ -118,11 +122,17 @@ DATABASES = {
     # }
     }
 
-FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://fake1.local/api/v1/files/')
-API_BASE_URL = os.getenv('API_BASE_URL', 'https://fake1.local/api/v1')
+FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://192.168.1.110/api/v1/files/')
+API_BASE_URL = os.getenv('API_BASE_URL', 'https://192.168.1.110/api/v1')
+API_USUARIO  = os.getenv('API_USUARIO', 'usuario-api')
+API_PASSWORD = os.getenv('API_PASSWORD', 'password-api')
+API_CERT_PATH = os.getenv('API_CERT_PATH', '/home/agustin/tesis/nginx-config-files/RootCA.pem')
 SETTINGS_EXPORT = [
    'FILES_API_BASE_URL',
-   'API_BASE_URL'
+   'API_BASE_URL',
+   'API_USUARIO',
+   'API_PASSWORD',
+   'API_CERT_PATH'
 ]
 
 # Auth

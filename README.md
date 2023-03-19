@@ -1,6 +1,8 @@
 # django-app
 Aplicación de Django recuperada del proyecto integrador anterior. Se adaptará y modificará para aplicarlo al proyecto actual.
 
+sudo apt install -y python3-dev python3-venv
+
 
 ## Pasos de instalación
 
