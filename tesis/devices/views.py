@@ -194,7 +194,11 @@ class ManageView(DetailView):
 		# Para asegurarnos que el usuario loggeado tenga las categorías soportadas para controlar este dispositivo.
 		for cat in user_cat:
 			if cat in device.category_list.all():
-				context = {'device' : device.device_name }
+				context = {
+					'device' : device.device_name,
+	                'port': device.port,
+			        'host': device.ip_address
+				}
 				return render(request, 'devices/device_detail.html', context)
 		return HttpResponseRedirect('/inicio')
 
