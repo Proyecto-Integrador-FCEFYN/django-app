@@ -16,8 +16,11 @@ RUN sed -i "261s/'%s__iexact' % UserModel.get_email_field_name()/'email'/" /usr/
 COPY ./tesis /app
 
 RUN curl -LJO https://raw.githubusercontent.com/Proyecto-Integrador-FCEFYN/nginx-config-files/master/RootCA.pem
-COPY RootCA.pem /app/
+RUN pwd
+RUN ls
 ENV API_CERT_PATH=/app/RootCA.pem
+
+EXPOSE 80 443 27017
 
 # Este anda
 CMD gunicorn tesis.wsgi:application --bind 0.0.0.0:8000
