@@ -122,8 +122,8 @@ DATABASES = {
     # }
     }
 
-FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://192.168.1.110/api/v1/files/')
-API_BASE_URL = os.getenv('API_BASE_URL', 'https://192.168.1.110/api/v1')
+FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://192.168.24.120/api/v1/files/')
+API_BASE_URL = os.getenv('API_BASE_URL', 'https://192.168.24.120/api/v1')
 API_USUARIO  = os.getenv('API_USUARIO', 'usuario-api')
 API_PASSWORD = os.getenv('API_PASSWORD', 'password-api')
 API_CERT_PATH = os.getenv('API_CERT_PATH', '/home/agustin/tesis/nginx-config-files/RootCA.pem')
