@@ -11,7 +11,7 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 RUN sed -i '151s/.$//' /usr/local/lib/python3.8/site-packages/django/contrib/admin/widgets.py
-RUN sed -i "261s/'%s__iexact' % UserModel.get_email_field_name()/'email'/" /usr/local/lib/python3.8/site-packages/django/contrib/auth/forms.py
+RUN sed -i "262s/'%s__iexact' % UserModel.get_email_field_name()/'email'/" /usr/local/lib/python3.8/site-packages/django/contrib/auth/forms.py
 
 COPY ./tesis /app
 
@@ -20,7 +20,7 @@ RUN pwd
 RUN ls
 ENV API_CERT_PATH=/app/RootCA.pem
 
-EXPOSE 80 443 27017
+EXPOSE 80 443 27017 587
 
 # Este anda
 CMD gunicorn tesis.wsgi:application --bind 0.0.0.0:8000

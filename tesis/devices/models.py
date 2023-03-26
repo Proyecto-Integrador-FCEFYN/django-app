@@ -33,7 +33,7 @@ class Device(models.Model):
 	type = models.CharField(_('Tipo de dispositivo'), max_length=10)
 	category_list = models.ManyToManyField('users.Category', blank=True, related_name="device_category_list", verbose_name='Categoria')
 	last_ping = models.DateTimeField(_('Fecha y hora de último ping'))
-	cert = models.CharField(_('Certificado'), max_length=4096)
+	cert = models.TextField(_('Certificado'), max_length=4096)
 	usuario = models.CharField(_('Usuario Autenticacion'), max_length=50, default='')
 	password = models.CharField(_('Password Autenticacion'), max_length=50, default='')
 

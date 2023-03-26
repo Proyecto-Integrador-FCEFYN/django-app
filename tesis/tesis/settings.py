@@ -102,19 +102,19 @@ WSGI_APPLICATION = 'tesis.wsgi.application'
 # - La base establecida por "default" será la primera a la que se querrá acceder. El rounter dbRouter intenterá escribir o leer de esa base, y en caso de falla
 #   se comunicará con la de backup.
 
-DATABASE_ROUTERS = ['tesis.dbRouter.dbRouter']
+# DATABASE_ROUTERS = ['tesis.dbRouter.dbRouter']
 DATABASES = {
-        'backup': {
-            'ENGINE': 'djongo',
-            'ENFORCE_SCHEMA': False,
-            'NAME': 'djongo',
-            'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo',
-        },
+        # 'backup': {
+        #     'ENGINE': 'djongo',
+        #     'ENFORCE_SCHEMA': False,
+        #     'NAME': 'djongo',
+        #     'HOST': 'mongodb://djongo:dj0ng0@24.232.132.26:27015/?authMechanism=DEFAULT&authSource=djongo',
+        # },
         'default': {
             'ENGINE': 'djongo',
             'ENFORCE_SCHEMA': False,
-            'NAME': 'backup-djongo',
-            'HOST': 'mongodb://127.0.0.1:27017'
+            'NAME': 'djongo',
+            'HOST': 'mongodb://roberto:sanchez@192.168.24.120:27017'
         }
     #         'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -154,12 +154,12 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # se utiliza el servidor smtp de google, conexion segura con
 # ssl y la cuenta de gmail creada para la placa.
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'accesolac@gmail.com'
+EMAIL_HOST = 'smtp-relay.sendinblue.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'agustincarranza@mi.unc.edu.ar'
 # EMAIL_HOST_PASSWORD = 'raspberry'
-EMAIL_HOST_PASSWORD ='qqpshylxrwvyuvju'
-EMAIL_USE_SSL = True
+EMAIL_HOST_PASSWORD ='SL2706Owy3vpTnaG'
+EMAIL_USE_SSL = False
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
