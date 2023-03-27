@@ -23,4 +23,4 @@ ENV API_CERT_PATH=/app/RootCA.pem
 EXPOSE 80 443 27017 587
 
 # Este anda
-CMD gunicorn tesis.wsgi:application --bind 0.0.0.0:8000
+CMD ["gunicorn", "tesis.wsgi:application", "--bind", "0.0.0.0:8000"]

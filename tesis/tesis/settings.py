@@ -25,11 +25,17 @@ SECRET_KEY = ')yp24--99+$n%9&4+@4q=rzkpwcc9*db9$!5hsc-1kv0g+*c27'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.110', 
+ALLOWED_HOSTS = ['192.168.1.253', 
                  '200.16.19.25', 
                  'lac.efn.uncor.edu',
                  '127.0.0.1', 
-                 'localhost']
+                 'localhost',
+                 'ingreso.lac',
+                 '192.168.24.120']
+
+CSRF_TRUSTED_ORIGINS = ['ingreso.lac',
+                        '192.168.1.253']
+
 
 
 # Application definition

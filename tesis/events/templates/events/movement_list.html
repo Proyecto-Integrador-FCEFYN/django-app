@@ -61,7 +61,7 @@ Detecciones de movimiento
 						<tr>
 							<th>Fecha y hora</th>
 							<th>Dispositivo</th>
-							<th>Miniatura</th>
+							<th>Acceso</th>
 							<th>Ampliar</th>
 						</tr>
 					</thead>
@@ -71,10 +71,12 @@ Detecciones de movimiento
 								<td>{{ obj.date_time }}</td>
 								<td>{{ obj.device.device_name }}</td>
 								<td>
-                                    <video width="320" height="240" controls preload="none">
+                                    <!-- <video width="320" height="240" controls preload="none">
                                          <source src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" type=video/mp4>
                                          Your browser does not support the video tag.
-                                    </video>
+                                    </video> -->
+									<!-- <img class="img-fluid rounded" loading="lazy" style="max-width:100px; max-height:75px;" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontró la imagen!"> -->
+									<a class="btn bt btn-success" href="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" target="_blank">Clic para abrir</a>
 								</td>
 								<td>
 									<button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#{{ settings.FILES_API_BASE_URL }}{{ obj.image }}"><span class="fa fa-image"></span></button>
@@ -91,10 +93,7 @@ Detecciones de movimiento
 											</button>
 										</div>
 										<div class="modal-body mx-auto">
-                                            <video width="640" height="480" controls autoplay preload="auto" loop>
-                                                <source src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" type=video/mp4>
-                                                 Your browser does not support the video tag.
-                                            </video>
+											<img class="img-fluid rounded" loading="lazy" src="{{ settings.FILES_API_BASE_URL }}{{ obj.image }}" alt="No se encontró la imagen">
 										</div>
 									</div>
 								</div>
