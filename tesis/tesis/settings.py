@@ -31,7 +31,9 @@ ALLOWED_HOSTS = ['192.168.1.253',
                  '127.0.0.1', 
                  'localhost',
                  'ingreso.lac',
-                 '192.168.24.120']
+                 '192.168.24.120',
+                 '192.168.2.18',
+                 '192.168.2.28']
 
 CSRF_TRUSTED_ORIGINS = ['ingreso.lac',
                         '192.168.1.253']
@@ -120,7 +122,7 @@ DATABASES = {
             'ENGINE': 'djongo',
             'ENFORCE_SCHEMA': False,
             'NAME': 'djongo',
-            'HOST': 'mongodb://roberto:sanchez@192.168.24.120:27017'
+            'HOST': 'mongodb://roberto:sanchez@192.168.2.18:27017'
         }
     #         'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -128,8 +130,8 @@ DATABASES = {
     # }
     }
 
-FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://192.168.24.120/api/v1/files/')
-API_BASE_URL = os.getenv('API_BASE_URL', 'https://192.168.24.120/api/v1')
+FILES_API_BASE_URL = os.getenv('FILES_API_BASE_URL', 'https://192.168.2.18/api/v1/files/')
+API_BASE_URL = os.getenv('API_BASE_URL', 'https://192.168.2.18/api/v1')
 API_USUARIO  = os.getenv('API_USUARIO', 'usuario-api')
 API_PASSWORD = os.getenv('API_PASSWORD', 'password-api')
 API_CERT_PATH = os.getenv('API_CERT_PATH', '/home/agustin/tesis/nginx-config-files/RootCA.pem')
