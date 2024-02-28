@@ -8,8 +8,6 @@ RUN sed -i '151s/.$//' /usr/local/lib/python3.8/site-packages/django/contrib/adm
 RUN sed -i "262s/'%s__iexact' % UserModel.get_email_field_name()/'email'/" /usr/local/lib/python3.8/site-packages/django/contrib/auth/forms.py
 COPY ./tesis /app
 RUN curl -LJO https://raw.githubusercontent.com/Proyecto-Integrador-FCEFYN/nginx-config-files/master/RootCA.pem
-RUN pwd
-RUN ls
 ENV API_CERT_PATH=/app/RootCA.pem
 EXPOSE 80 443 27017 587
 CMD ["gunicorn", "tesis.wsgi:application", "--bind", "0.0.0.0:8000"]
