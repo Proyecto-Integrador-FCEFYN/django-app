@@ -276,7 +276,7 @@ class UserRegisterStep4View(AdminTest, FormView):
 		API_USUARIO = settings.API_USUARIO
 		API_PASSWORD = settings.API_PASSWORD
 		API_CERT_PATH = settings.API_CERT_PATH
-		
+
 		device = Device.objects.get(pk=device_pk)
 
 		data = {
@@ -284,9 +284,9 @@ class UserRegisterStep4View(AdminTest, FormView):
     		"port": device.port,
     		"usuario": device.usuario,
     		"password": device.password
-		}	
+		}
 		try:
-			r = requests.post(url=f"{BASE_URL}/rfid", json=data, auth=(API_USUARIO, API_PASSWORD), 
+			r = requests.post(url=f"{BASE_URL}/rfid", json=data, auth=(API_USUARIO, API_PASSWORD),
 		    	verify=API_CERT_PATH)
 			if r.status_code == 200:
 				return r.json()['rfid']
@@ -754,7 +754,7 @@ class UserCodeEditSuccessView(AdminTest, TemplateView):
 # Vista que muestra el formulario precargado para editar los datos
 # del usuario.
 class UserEditView(AdminTest, UpdateView):
-	
+
 	# Modelo a utilizar
 	model = User
 	# Template a utilizar
@@ -801,7 +801,7 @@ class UserEditView(AdminTest, UpdateView):
 					'category_list': forms.CheckboxSelectMultiple
 				})
 		return super(UserEditView, self).dispatch(request, **kwargs)
-		
+
 
 	# Funcion que genera el contexto para el template, en este caso interesa
 	# utilizar la clave principal del usuario en caso de querer modificar el

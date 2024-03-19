@@ -1,7 +1,8 @@
 from django.db import models
 from django.core import validators
-
+from django.contrib.auth.hashers import make_password
 from django.urls import reverse
+from cryptographic_fields.fields import EncryptedCharField
 from django.utils.translation import gettext_lazy as _
 # from djongo import models
 # from django.contrib.postgres.fields import ArrayField
@@ -34,11 +35,13 @@ class Device(models.Model):
 	category_list = models.ManyToManyField('users.Category', blank=True, related_name="device_category_list", verbose_name='Categoria')
 	last_ping = models.DateTimeField(_('Fecha y hora de último ping'))
 	cert = models.TextField(_('Certificado'), max_length=4096)
-	usuario = models.CharField(_('Usuario Autenticacion'), max_length=50, default='')
-	password = models.CharField(_('Password Autenticacion'), max_length=50, default='')
+	usuario = models.CharField(_('Usuario Autenticación'), max_length=50, default='')
+	password = EncryptedCharField(_('Password Autenticación'), max_length=8, default='', blank=True)
 
-	def get_name(self):
-		return 'Device'
+	# def get_name(self):
+	# 	return 'Device'
+	def __str__(self):
+		return str(self.device_name)
 
 	# Direccion url de retorno, se utiliza para cuando se edita el modelo.
 	def get_absolute_url(self):

@@ -28,11 +28,8 @@ Dispositivos
 	                <div class="col-12 col-sm-4">
 	                    <!-- La etiqueta del campo. -->
 	                    <div class="form-group">
-	                        Nueva Contraseña
+							{{ field.label_tag }}
 	                    </div>
-						<div class="form-group ">
-							Confirmar Contraseña
-						</div>
 
 	                </div>
 	                <!-- En pantallas pequeñas utiliza toda la fila y en medianas en adelante 4 columnas. -->
@@ -48,9 +45,6 @@ Dispositivos
 	                    {% endif %}
 	                    <!-- Se recorren los campos visibles del formulario y se los muestran sin la etiqueta, sin texto predefinido (placeholder) y sin ayuda. -->
 	                    <div class="form-group">
-	                        {% bootstrap_field field show_label=False show_help=False placeholder=False %}
-	                    </div>
-						<div class="form-group">
 	                        {% bootstrap_field field show_label=False show_help=False placeholder=False %}
 	                    </div>
 	                </div>

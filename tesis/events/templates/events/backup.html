@@ -13,12 +13,18 @@ Copia de seguridad
 
 	<div class="col-12 col-md-5">
 		<!-- Subtitulo para la copia integral del sistema. -->
+		<h7 class="text-danger mt-5">Atención: Ambas acciones pueden llevar varios minutos, dependiendo el tamaño de los datos a
+			comprimir.</h7>
+			<br>
+			<br>
 		<h5 class="h5 text-info">Copia de seguridad del sistema integral:</h5>
-		<div class="alert alert-light pl-0">Se realiza una copia de todos los archivos y se colocan dentro de un archivo de tipo zip para su descarga directa.</div>
+		<div class="alert alert-light pl-0">Se realiza una copia de todos los archivos y se colocan dentro de un archivo
+			de tipo zip para su descarga directa.</div>
 		<button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#confirmationModal">
 			<span class="fa fa-clone"></span> Realizar copia de todo el sistema
 		</button>
-		<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalTitle" aria-hidden="true">
+		<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"
+			aria-labelledby="confirmationModalTitle" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -33,25 +39,48 @@ Copia de seguridad
 					</div>
 					<div class="modal-footer">
 						<!-- Formulario. -->
-					    <form class="form-group" method="post">
-					        {% csrf_token %}
-					        <button class="btn btn-outline-secondary" type="submit" name="complete_backup">Realizar copia de todas formas</button>
-					    </form>
+						<form class="form-group" method="post">
+							{% csrf_token %}
+							<button class="btn btn-outline-secondary" type="submit" name="complete_backup">Realizar
+								copia de todas formas</button>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
+		<!-- Subtitulo para la copia de la base de datos unicamente. -->
+		<h5 class="h5 text-info mt-5">Copia de seguridad de la base de datos:</h5>
+		<div class="alert alert-light pl-0">Se realiza una copia de la actual base de datos y se coloca dentro de un
+			archivo de tipo zip para su descarga directa.</div>
+		<!-- Formulario. -->
+		<form class="form-group" method="post">
+			{% csrf_token %}
+			<button class="btn btn-outline-secondary" type="submit" name="database_backup"><span
+					class="fa fa-clone"></span> Realizar copia de la base de datos</button>
 
-		
-	    <!-- Subtitulo para la copia de la base de datos unicamente. -->
-	   	<h5 class="h5 text-info mt-5">Copia de seguridad de la base de datos:</h5>
-	   	<div class="alert alert-light pl-0">Se realiza una copia de la actual base de datos y se coloca dentro de un archivo de tipo zip para su descarga directa.</div>
-	   	<!-- Formulario. -->
-	    <form class="form-group" method="post">
-	        {% csrf_token %}
-	        <button class="btn btn-outline-secondary" type="submit" name="database_backup"><span class="fa fa-clone"></span> Realizar copia de la base de datos</button>
-	    </form>
+			<div class="alert alert-light pl-0">Descomprima el archivo descargado. Esto generará una carpeta con el dump
+				de las bases de datos.
+				<br>
+				Sitúese en el carpeta 'backups'. Para hacer la restauración en otra base de datos, utilice el comando
+				<a href=https://www.mongodb.com/docs/database-tools/mongorestore />mongorestore</a>, indicando por parámetro
+				si se va a hacer la restauración de la base 'default' o la base de 'backup'.
+			</div>
+		</form>
+		Ejemplo:<br>
 	</div>
+
+	<code class="col-12 col-md-5">
+		user@user: backups$ ls -l </code><br>
+		<code class="col-12 col-md-5"> drwxrwxr-x 3 user user 4096 mar 27 21:07 backup </code><br>
+		<code class="col-12 col-md-5">drwxrwxr-x 3 user user 4096 mar 27 21:14 default</code><br><br>
+		<code class="col-12 col-md-5">[...]<br></code>
+		<code class="col-12 col-md-5">user@user: mongorestore --uri="mongodb://root:root@172.17.0.2:27017" --authenticationDatabase admin default --drop<br><br>
+		<code class="col-12 col-md-5">2023-03-27T21:33:13.007-0300	finished restoring djongo.devices_device_category_list (0 documents, 0 failures)</code><br>
+		<code class="col-12 col-md-5">2023-03-27T21:33:13.016-0300	finished restoring djongo.users_user_category_list (0 documents, 0 failures)<br></code>
+		<code class="col-12 col-md-5">2023-03-27T21:33:13.020-0300	finished restoring djongo.events_permittedaccess (0 documents, 0 failures)<br>
+		<code class="col-12 col-md-5">2023-03-27T21:33:13.020-0300	9 document(s) restored successfully. 0 document(s) failed to restore.<br></code>
+
+	</code>
 </div>
 
 {% endblock content %}

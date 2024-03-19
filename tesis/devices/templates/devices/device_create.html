@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-dispositivos
+Agregar dispositivo
 {% endblock title %}
 
 {% block content %}
@@ -44,11 +44,7 @@ dispositivos
 	                    {% endif %}
 	                    <!-- Se recorren los campos visibles del formulario y se los muestran sin la etiqueta, sin texto predefinido (placeholder) y sin ayuda. -->
 	                    <div class="form-group">
-							{% if field == 'Category object'  %}
-							Hola
-							{% else %}
 	                        {% bootstrap_field field show_label=False show_help=False placeholder=False %}
-							{% endif %}
 	                        <!-- Se da formato al texto de ayuda del campo. -->
 	                        <div style="margin-top: -16px;">
                         		<small class="text-muted">{{ field.help_text }}</small>

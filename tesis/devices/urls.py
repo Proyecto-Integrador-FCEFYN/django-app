@@ -20,6 +20,7 @@ urlpatterns=[
 
 
 	url(r'^dispositivos/editar/(?P<pk>[0-9]+)/$', views.DeviceEditView.as_view(), name='device_edit'),
+    url(r'^dispositivos/changepwd/(?P<pk>[0-9]+)/$', views.ChangePwdView.as_view(), name='change_pwd'),
 	url(r'^dispositivos/eliminar/(?P<pk>[0-9]+)/$', views.DeviceDeleteView.as_view(),
 		name='device_delete'),
     url(r'^dispositivos/crear/$', views.DeviceCreateView.as_view(),

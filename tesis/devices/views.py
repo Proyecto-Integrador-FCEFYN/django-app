@@ -1,13 +1,12 @@
 from ipaddress import ip_address
 from django.shortcuts import render
-# Se importa el archivo de configuracion del proyecto para utilizar la variable
-# que contiene el path absoluto del mismo en caso de realizar el backup.
-from django.conf import settings
 # Se importa la vista de la aplicacion "users" para la verificacion
 # de que el usuario sea admin, osea "is_staff=True".
 from users.views import AdminTest
 # Para realizar querysets mas especificos.
 from django.db.models import Q
+from django.conf import settings
+import socket
 # Agregados a las vistas para mayor control, como requerimiento de logueo
 # y comprobacion de que el usuario sea admin.
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -27,6 +26,8 @@ from django.utils import timezone
 from django.views import View
 # Vistas genericas para mostrar informacion de los modelos.
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, RedirectView, DetailView
+from django.views.generic.edit import *
+from .forms import *
 # Vista generica para actualizar campos de los modelos.
 from django.views.generic.edit import UpdateView
 import paho.mqtt.publish as publish
@@ -100,16 +101,27 @@ class DeviceCreateView(AdminTest, CreateView):
 			'password': forms.PasswordInput()
 		})
 
-	
+
 class DeviceEditView(AdminTest, UpdateView):
 	model = Device
 	template_name = 'devices/device_edit.html'
 	form_class = modelform_factory(Device,
-		fields = ['device_name', 'ip_address','port' ,'MAC_address','type', 'category_list', 'cert', 'usuario', 'password'],
+		fields = ['device_name', 'ip_address','port' ,'MAC_address','type', 'category_list', 'cert'],
 		widgets={
-			'category_list': forms.CheckboxSelectMultiple,
-			'password': forms.PasswordInput()
+			'category_list': forms.CheckboxSelectMultiple
 		})
+
+class ChangePwdView(AdminTest, FormView):
+	model = Device
+	template_name = 'devices/change_pwd.html'
+	form_class = DeviceForm
+
+	def form_valid(self, form, **kwargs):
+		device = Device.objects.get(pk=self.kwargs['pk'])
+		device.usuario=form.cleaned_data['usuario']
+		device.password=form.cleaned_data['password']
+		device.save()
+		return HttpResponseRedirect(reverse('devices:device_edit', kwargs={'pk':self.kwargs['pk']}))
 
 
 class DeviceDeleteView(AdminTest, DeleteView):
@@ -119,47 +131,64 @@ class DeviceDeleteView(AdminTest, DeleteView):
 # Vista que muestra los dispositivos que pueden ser controlados por usuario actual.
 class HomeView(View):
 	def get(self, request, **kwargs):
-		context = self.get_context_data(**kwargs)
-		return render(request, 'devices/homepage.html', context)
+		try:
+			database = self.test_connection_to_db()
+			context = {'database': database}
+			context.update(self.get_context_data(**kwargs))
+			return render(request, 'devices/homepage.html', context)
+		except Exception:
+			return HttpResponseRedirect('/')
 
 	def get_context_data(self, **kwargs):
-		user_cat = self.request.user.category_list.all()
-		user_name = '{} {}'.format(self.request.user.first_name, self.request.user.last_name)
-		categorias = []
-		for cat in user_cat:
-			categorias.append(cat.id)
-		devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
-		button_events = []
-		for dev in devices:
-			events = Button.objects.filter(device = dev)
-			if events:
-				current_event = events.order_by('-date_time')[0]
-				current_timezone = datetime.datetime.strptime(
-					((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
-				current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
-				current_event.date_time = current_timezone
+		try:
+			user_cat = self.request.user.category_list.all()
+			user_name = '{} {}'.format(self.request.user.first_name, self.request.user.last_name)
+			categorias = []
+			for cat in user_cat:
+				categorias.append(cat.id)
+			devices = Device.objects.filter(Q(category_list__in=categorias)).distinct()
+			button_events = []
+			for dev in devices:
+				events = Button.objects.filter(device = dev)
+				if events:
+					current_event = events.order_by('-date_time')[0]
+					current_timezone = datetime.datetime.strptime(
+						((current_event).date_time).replace('T',' '), '%Y-%m-%d %H:%M:%S.%f')
+					current_timezone = current_timezone.strftime('%d-%B-%Y %H:%M')
+					current_event.date_time = current_timezone
 
-				if button_events:
-					if (button_events[0].date_time < current_timezone):
-						button_events.insert(0,current_event)
+					if button_events:
+						if (button_events[0].date_time < current_timezone):
+							button_events.insert(0,current_event)
+						else:
+							button_events.append(current_event)
 					else:
 						button_events.append(current_event)
-				else:
-					button_events.append(current_event)
 
-		context = {'device_list' : devices,
-		'user_category': user_cat,
-		'user_name': user_name,
-		'button_events': button_events}
-		return context
+			context = {'device_list' : devices,
+			'user_category': user_cat,
+			'user_name': user_name,
+			'button_events': button_events}
+			return context
+		except Exception:
+			return HttpResponseRedirect('/')
+
+	def test_connection_to_db(self):
+		try:
+			db_definition = getattr(settings, 'DATABASES')['default']
+			s = socket.create_connection((db_definition['my_host'], db_definition['my_port']), 5)
+			s.close()
+			return 'Default'
+		except:
+			return 'Backup'
 
 class PingDevicesView(AdminTest, RedirectView):
 	def get_redirect_url(self, **kwargs):
 		devices = Device.objects.all()
 		self.pingDevices(devices)
 		return reverse('devices:device_list')
-	
-	
+
+
 	def pingDevices(self, device_list):
 		for device in device_list:
 			if ping(device.ip_address):
@@ -170,16 +199,16 @@ class PingDevicesView(AdminTest, RedirectView):
 			else:
 				message = '{}:  No se encuentra el dispositivo.'.format(device.device_name)
 				messages.error(self.request, message)
-			
+
 
 class PingDeviceView(AdminTest, RedirectView):
 	def get_redirect_url(self, **kwargs):
 		device = Device.objects.get(pk=self.kwargs['pk'])
 		self.pingDevices(device)
 		return reverse('devices:device_list')
-	
-	
-	def pingDevices(self, device):	
+
+
+	def pingDevices(self, device):
 		if ping(device.ip_address):
 			device.last_ping = timezone.now()
 			device.save()
@@ -188,7 +217,7 @@ class PingDeviceView(AdminTest, RedirectView):
 		else:
 			message = '{}:  No se encuentra el dispositivo.'.format(device.device_name)
 			messages.error(self.request, message)
-	
+
 class ManageView(DetailView):
 	def get(self,request, **kwargs):
 		user_cat = self.request.user.category_list.all()
@@ -198,11 +227,11 @@ class ManageView(DetailView):
 			if cat in device.category_list.all():
 				context = {
 					'device' : device.device_name,
-	                'port': device.port,
-			        'host': device.ip_address
-				}
+					'port': device.port,
+					'host': device.ip_address
+					}
 				return render(request, 'devices/device_detail.html', context)
-		return HttpResponseRedirect('/inicio')
+		return HttpResponseRedirect('/')
 
 	def post(self, request, **kwargs):
 
@@ -225,8 +254,8 @@ class ManageView(DetailView):
 			"usuario": device.usuario,
 			"password": device.password
 		}
-		r = requests.post(url=f"{BASE_URL}/event/webbutton", json=data, auth=(API_USUARIO, API_PASSWORD), 
-		    verify=API_CERT_PATH)
+		r = requests.post(url=f"{BASE_URL}/event/webbutton", json=data, auth=(API_USUARIO, API_PASSWORD),
+					verify=API_CERT_PATH)
 		if r.status_code == 200:
 			messages.success(self.request, "Mensaje enviado.")
 		else:
