@@ -21,7 +21,6 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, RedirectView
 # Vista generica para actualizar campos de los modelos.
 from django.views.generic.edit import UpdateView
-from pymongo import MongoClient
 import bson, sys, os, os.path
 import paho.mqtt.publish as publish
 # Para realizar querysets mas especificos.
@@ -54,7 +53,7 @@ import datetime
 import os
 # Para utilizar como buffer del archivo zip en caso de realizar backups.
 from io import BytesIO
-
+import re
 # Para crear el archivo zip en caso de realizar backups.
 import zipfile
 import logging
@@ -776,29 +775,39 @@ class BackupView(AdminTest, View):
 					# dentro del mismo ("file_destiny").
 					zip_file.write(file_data, file_destiny)
 			# Se crea el nombre del archivo a descargar junto con la fecha del dia actual.
-			filename = 'backup del sistema (%s).zip' % today
+			filename = 'system_backup_%s.zip' % today
 		# Si se presiona el boton de "Copia de seguridad de la base de datos".
 		elif 'database_backup' in request.POST:
 			if settings.DATABASES['default']['ENGINE'] == 'djongo':
 				# Backup de base default
-				mongoUri = settings.DATABASES['default']['HOST']
-				conn = MongoClient(mongoUri)
-				collections = ['users_user', 'users_visitor', 'users_timezone', 'django_session']
+				# collections = ['devices_device', 'devices_device_category_list',
+		        # 'events_button', 'events_deniedaccess', 'events_movement',
+				# 'events_movementtimezone', 'events_permittedaccess',
+				# 'events_webopendoor', 'users_category', 'users_timezone',
+				# 'django_session', 'users_user', 'users_user_category_list', 'users_visitor']
 				db_name = settings.DATABASES['default']['NAME']
+				path = settings.BASE_DIR + '/backups/'
 				try:
-					self.dump(collections, conn, db_name, 'respaldo_bd-default')
+					# mongodump -d djongo --uri="mongodb://roberto:sanchez@150.136.250.71:27017" --authenticationDatabase admin --excludeCollectionsWithPrefix django_ --excludeCollectionsWithPrefix __
+
+					# cmd = 'mongodump -d {} --uri="{}" --authenticationDatabase admin --excludeCollectionsWithPrefix django_ --excludeCollectionsWithPrefix __ --out {}/default'.format(
+						# db_name,settings.DATABASES['default']['HOST'], path)
+					host = settings.DATABASES['default']['HOST']
+					cmd = construir_comando(db_name, host, path)
+					os.system(cmd)
 				except Exception as e:
 					logger.error("Error: %s", str(e))
 
-				# Backup de base backup
-				mongoUri = settings.DATABASES['backup']['HOST']
-				conn = MongoClient(mongoUri)
+				# # Backup de base backup
 				db_name = settings.DATABASES['backup']['NAME']
 				try:
-					self.dump(collections, conn, db_name, 'respaldo_bd-backup')
+					# cmd = 'mongodump -d {} --uri="{}" --out {}/backup'.format(
+					# 	db_name,settings.DATABASES['backup']['HOST'], path)
+					host = settings.DATABASES['backup']['HOST']
+					cmd = construir_comando(db_name, host, path)
+					os.system(cmd)
 				except Exception as e:
 					logger.error("Error: %s", str(e))
-				path = settings.BASE_DIR + '/backups/'
 				for root, dirs, files in os.walk(path):
 					for file in files:
 						zip_file.write(os.path.join(root, file),
@@ -813,7 +822,7 @@ class BackupView(AdminTest, View):
 				# Se escribe el archivo zip.
 				zip_file.write(file_data, file_name)
 				# Se crea el nombre del archivo a descargar junto con la fecha del dia actual.
-			filename = 'backup de la base de datos (%s).zip' % today
+			filename = 'db_backup_%s.zip' % today
 		# Se cierra el archivo zip.
 		zip_file.close()
 		# Se crea la respuesta, de tipo zip y con datos obtenidos del buffer de tipo string.
@@ -822,27 +831,25 @@ class BackupView(AdminTest, View):
 		response['Content-Disposition'] = 'attachment; filename=%s' % filename
 		# Se retorna la respuesta con el archivo zip a descargar.
 		return response
-	
-	def dump(self, collections, conn, db_name, directory):
-		"""
-		MongoDB Dump
-		:param collections: Database collections name
-		:param conn: MongoDB client connection
-		:param db_name: Database name
-		:param path:
-		:return:
-		
-		>>> DB_BACKUP_DIR = '/path/backups/'
-		>>> conn = MongoClient("mongodb://admin:admin@127.0.0.1:27017", authSource="admin")
-		>>> db_name = 'my_db'
-		>>> collections = ['collection_name', 'collection_name1', 'collection_name2']
-		>>> dump(collections, conn, db_name, DB_BACKUP_DIR)
-		"""
-		db = conn[db_name]
-		path = settings.BASE_DIR + '/backups/'+ directory
-		if not os.path.exists(path):
-			os.makedirs(path)
-		for coll in collections:
-			with open(os.path.join(path , f'{coll}.bson'), 'wb+') as f:
-				for doc in db[coll].find():
-					f.write(bson.BSON.encode(doc))
+
+
+def tiene_usuario_y_contraseña(uri):
+    # Expresión regular para buscar un nombre de usuario y una contraseña en la URI
+    regex = r"mongodb:\/\/(\w+):(\w+)@"
+    # Buscar coincidencias en la URI
+    match = re.search(regex, uri)
+    # Si hay coincidencias, significa que se proporciona un usuario y una contraseña
+    if match:
+        return True
+    else:
+        return False
+
+
+def construir_comando(db_name, host, path):
+    if tiene_usuario_y_contraseña(host):
+        cmd = 'mongodump -d {} --uri="{}" --authenticationDatabase admin --excludeCollectionsWithPrefix django_ --excludeCollectionsWithPrefix __ --out {}/default'.format(
+            db_name, host, path)
+    else:
+        cmd = 'mongodump -d {} --uri="{}" --out {}/backup'.format(
+            db_name, host, path)
+    return cmd
